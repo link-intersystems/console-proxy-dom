@@ -4,6 +4,13 @@ import {
   createConsoleProxy,
 } from "../consoleProxy";
 
+export function createConsoleMock() {
+  return consoleFnNames.reduce((proxy, fn) => {
+    (proxy as any)[fn] = jest.fn();
+    return proxy;
+  }, {} as Console);
+}
+
 describe("ConsoleProxy Tests", () => {
   let consoleMock: Console;
   let consoleProxy: ConsoleProxy;
@@ -11,10 +18,7 @@ describe("ConsoleProxy Tests", () => {
   beforeAll(() => {});
 
   beforeEach(() => {
-    consoleMock = consoleFnNames.reduce((proxy, fn) => {
-      (proxy as any)[fn] = jest.fn();
-      return proxy;
-    }, {} as Console);
+    consoleMock = createConsoleMock();
     consoleProxy = createConsoleProxy(consoleMock);
   });
 
