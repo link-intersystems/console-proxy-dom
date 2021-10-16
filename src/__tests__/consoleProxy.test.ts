@@ -79,6 +79,43 @@ describe("ConsoleProxy Tests", () => {
     expect(defaultHandlerMock).toHaveBeenCalledWith("enabled");
   });
 
+  test("create with partial console", () => {
+    const defaultHandlerMock = jest.fn();
+    consoleProxy = createConsoleProxy(consoleMock, {
+      log: defaultHandlerMock,
+    });
+
+    consoleProxy.log("enabled");
+
+    expect(defaultHandlerMock).toHaveBeenCalledWith("enabled");
+  });
+
+  test("create with default console", () => {
+    const origConsole = { ...console };
+    const logFn = jest.fn();
+    console.log = logFn;
+
+    try {
+      consoleProxy = createConsoleProxy();
+
+      consoleProxy.log("enabled");
+
+      expect(logFn).toHaveBeenCalledWith("enabled");
+    } finally {
+      console.log = origConsole.log;
+    }
+  });
+
+  test("create with custom console", () => {
+    const customConsole = createConsoleMock();
+    consoleProxy = createConsoleProxy(customConsole);
+
+    consoleProxy.log("enabled");
+
+    expect(customConsole.log).toHaveBeenCalledWith("enabled");
+    expect(consoleMock.log).not.toHaveBeenCalledWith("enabled");
+  });
+
   test("assert", () => {
     testConsoleMethod("assert", true, {
       msg: "assertCalled",

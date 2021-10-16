@@ -10,6 +10,8 @@ export type Invocation = {
 };
 export type Handler = (invocation: Invocation) => any;
 
+export type DefaultHandler = Handler | Partial<Console>;
+
 export type ConsoleProxy = Console & {
   setDefaultHandler: (handler?: Handler | Partial<Console>) => void;
   setFunctionHandler(
@@ -48,10 +50,13 @@ const passthroughHandler = (invocation: Invocation) => {
   return invocation.targetFn.apply(invocation.target, invocation.args);
 };
 
-export function createConsoleProxy(console: Console): ConsoleProxy {
-  const consoleCopy = { ...console };
+export function createConsoleProxy(
+  targetConsole: Console = console,
+  _defaultHandler: DefaultHandler = passthroughHandler
+): ConsoleProxy {
+  const origTargetConsole = { ...targetConsole };
 
-  let defaultHandler = passthroughHandler;
+  let defaultHandler: Handler;
 
   const fnHandlers = new Map<string, Handler>();
 
@@ -61,7 +66,7 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
   }
 
   function createProxyFn(fnName: ConsoleFunctionName): any {
-    const targetFn = (console as any)[fnName];
+    const targetFn = (targetConsole as any)[fnName];
     if (targetFn === undefined || typeof targetFn !== "function") {
       return undefined;
     }
@@ -70,7 +75,7 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
       const handler = getHandler(fnName);
 
       return handler({
-        target: consoleCopy,
+        target: origTargetConsole,
         targetFn,
         targetFnName: fnName,
         args: Array.from(arguments) as [],
@@ -92,7 +97,7 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
   }
 
   function setFunctionHandler(fnName: string, handler: () => any) {
-    if (!(fnName in console)) {
+    if (!(fnName in targetConsole)) {
       const msg = `Console doesn't have a function named ${fnName}`;
       throw new Error(msg);
     }
@@ -114,6 +119,8 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
     }
     return proxy;
   }, {} as ConsoleProxy);
+
+  setDefaultHandler(_defaultHandler);
 
   proxy.setFunctionHandler = setFunctionHandler;
   proxy.setDefaultHandler = setDefaultHandler;
