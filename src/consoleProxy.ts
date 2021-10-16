@@ -56,7 +56,8 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
   const fnHandlers = new Map<string, Handler>();
 
   function getHandler(fnName: string): Handler {
-    return fnHandlers.get(fnName) ?? defaultHandler;
+    const fnHandler = fnHandlers.get(fnName);
+    return fnHandler ? fnHandler : defaultHandler;
   }
 
   function createProxyFn(fnName: ConsoleFunctionName): any {
