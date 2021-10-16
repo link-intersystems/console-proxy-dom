@@ -12,6 +12,7 @@ export type Handler = (invocation: Invocation) => any;
 
 export type ConsoleProxy = Console & {
   defaultHandler: (fn: any, args: any[]) => any;
+  setDefaultHandler: (handler: Handler) => void;
   setFunctionHandler(
     fnName: ConsoleFunctionName,
     handler: () => any
@@ -44,23 +45,22 @@ export const consoleFnNames = Object.freeze([
   "warn",
 ]);
 
+const passthroughHandler = (invocation: Invocation) => {
+  return invocation.targetFn.apply(invocation.target, invocation.args);
+};
+
 export function createConsoleProxy(console: Console): ConsoleProxy {
   const consoleCopy = { ...console };
 
-  const defaultHandler = (target: Console, fn: any, args: any[]) => {
-    return fn.apply(target, args);
-  };
+  let defaultHandler = passthroughHandler;
 
   const fnHandlers = new Map<string, Handler>();
 
-  function getHandler(fnName: string): Handler | undefined {
-    return fnHandlers.get(fnName);
+  function getHandler(fnName: string): Handler {
+    return fnHandlers.get(fnName) ?? defaultHandler;
   }
 
-  function createProxyFn(
-    proxy: ConsoleProxy,
-    fnName: ConsoleFunctionName
-  ): any {
+  function createProxyFn(fnName: ConsoleFunctionName): any {
     const targetFn = (console as any)[fnName];
     if (targetFn === undefined || typeof targetFn !== "function") {
       return undefined;
@@ -69,21 +69,17 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
     return function () {
       const handler = getHandler(fnName);
 
-      if (handler) {
-        return handler({
-          target: console,
-          targetFn,
-          targetFnName: fnName,
-          args: Array.from(arguments) as [],
-        });
-      }
-
-      return defaultHandler(
-        consoleCopy,
-        (consoleCopy as any)[fnName],
-        Array.from(arguments)
-      );
+      return handler({
+        target: consoleCopy,
+        targetFn,
+        targetFnName: fnName,
+        args: Array.from(arguments) as [],
+      });
     };
+  }
+
+  function setDefaultHandler(handler: Handler = passthroughHandler) {
+    defaultHandler = handler;
   }
 
   function setFunctionHandler(fnName: string, handler: () => any) {
@@ -103,7 +99,7 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
   }
 
   const proxy = consoleFnNames.reduce((proxy, fn) => {
-    const proxyFn = createProxyFn(proxy, fn as ConsoleFunctionName);
+    const proxyFn = createProxyFn(fn as ConsoleFunctionName);
     if (proxyFn) {
       (proxy as any)[fn] = proxyFn.bind(proxy);
     }
@@ -111,6 +107,7 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
   }, {} as ConsoleProxy);
 
   proxy.setFunctionHandler = setFunctionHandler;
+  proxy.setDefaultHandler = setDefaultHandler;
 
   return proxy;
 }
