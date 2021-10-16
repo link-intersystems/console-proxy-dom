@@ -11,8 +11,7 @@ export type Invocation = {
 export type Handler = (invocation: Invocation) => any;
 
 export type ConsoleProxy = Console & {
-  defaultHandler: (fn: any, args: any[]) => any;
-  setDefaultHandler: (handler: Handler) => void;
+  setDefaultHandler: (handler?: Handler) => void;
   setFunctionHandler(
     fnName: ConsoleFunctionName,
     handler: () => any

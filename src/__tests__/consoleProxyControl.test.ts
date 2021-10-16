@@ -15,6 +15,36 @@ describe("ConsoleProxyControl Tests", () => {
     consoleProxyControl = createConsoleProxyControl(proxyTargetMock);
   });
 
+  test("setDefaultHandler", () => {
+    const defaultHandlerMock = jest.fn();
+    consoleProxyControl.proxy.setDefaultHandler(defaultHandlerMock);
+
+    const disableProxy = consoleProxyControl.enableProxy();
+    proxyTargetMock.log("enabled");
+    disableProxy();
+
+    expect(defaultHandlerMock).toHaveBeenCalledWith({
+      target: proxyTargetMock,
+      targetFn: proxyTargetMock.log,
+      targetFnName: "log",
+      args: ["enabled"],
+    });
+  });
+
+  test("Reset setDefaultHandler", () => {
+    const defaultHandlerMock = jest.fn();
+    consoleProxyControl.proxy.setDefaultHandler(defaultHandlerMock);
+    consoleProxyControl.proxy.setDefaultHandler();
+
+    const disableProxy = consoleProxyControl.enableProxy();
+    proxyTargetMock.log("enabled");
+    disableProxy();
+    expect(proxyTargetMock.log).toHaveBeenCalledWith("enabled");
+    proxyTargetMock.log("disabled");
+    expect(proxyTargetMock.log).toHaveBeenCalledWith("disabled");
+  });
+
+
   test("enable/disable proxy", () => {
     const disableProxy = consoleProxyControl.enableProxy();
     proxyTargetMock.log("enabled");
