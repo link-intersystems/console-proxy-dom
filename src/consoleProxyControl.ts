@@ -11,7 +11,7 @@ export type ConsoleProxyControl = {
   isProxyEnabled: () => boolean;
   setProxyEnabled: (enabled: boolean) => void;
   enableProxy: () => DisableProxy;
-  proxy: ConsoleProxy;
+  getProxy: () => ConsoleProxy;
   execTemplate<R = any>(fn: () => R): R;
   bindProxy<R = any>(fn: () => R): () => R;
 };
@@ -91,7 +91,7 @@ export function createConsoleProxyControl(
     isProxyEnabled,
     setProxyEnabled,
     enableProxy: enableProxy,
-    proxy: consoleProxy,
+    getProxy: () => consoleProxy,
     execTemplate,
     bindProxy,
   };

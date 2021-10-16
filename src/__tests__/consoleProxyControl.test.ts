@@ -1,4 +1,4 @@
-import { createConsoleProxy } from "consoleProxy";
+import { ConsoleProxy, createConsoleProxy } from "consoleProxy";
 import {
   ConsoleProxyControl,
   createConsoleProxyControl,
@@ -7,12 +7,13 @@ import { createConsoleMock } from "./consoleProxy.test";
 
 describe("ConsoleProxyControl Tests", () => {
   let proxyTargetMock: Console;
+  let proxy: ConsoleProxy;
   let consoleProxyControl: ConsoleProxyControl;
 
   beforeEach(() => {
     proxyTargetMock = createConsoleMock();
 
-    const proxy = createConsoleProxy(proxyTargetMock);
+    proxy = createConsoleProxy(proxyTargetMock);
     consoleProxyControl = createConsoleProxyControl(proxy);
   });
 
@@ -33,9 +34,8 @@ describe("ConsoleProxyControl Tests", () => {
     try {
       consoleProxyControl = createConsoleProxyControl();
 
-      const disableProxy = consoleProxyControl.enableProxy();
-      console.log("enabled");
-      disableProxy();
+      consoleProxyControl.execTemplate(() => console.log("enabled"));
+
       expect(console.log).toHaveBeenCalledWith("enabled");
     } finally {
       console.log = origConsole.log;
@@ -58,11 +58,7 @@ describe("ConsoleProxyControl Tests", () => {
   });
 
   test("getProxy", () => {
-    expect(consoleProxyControl.proxy).toBeDefined();
-
-    consoleProxyControl.proxy.log("getProxyTest");
-
-    expect(proxyTargetMock.log).toHaveBeenCalledWith("getProxyTest");
+    expect(consoleProxyControl.getProxy()).toBe(proxy);
   });
 
   test("execTemplate", () => {
@@ -79,7 +75,7 @@ describe("ConsoleProxyControl Tests", () => {
 
   test("redirected Template", () => {
     const logFnMock = jest.fn();
-    consoleProxyControl.proxy.setFunctionHandler("log", logFnMock);
+    proxy.setFunctionHandler("log", logFnMock);
 
     function testFn() {
       proxyTargetMock.log("test");
@@ -98,7 +94,7 @@ describe("ConsoleProxyControl Tests", () => {
 
   test("redirected template - proxy already enabled", () => {
     const logFnMock = jest.fn();
-    consoleProxyControl.proxy.setFunctionHandler("log", logFnMock);
+    proxy.setFunctionHandler("log", logFnMock);
 
     function testFn() {
       proxyTargetMock.log("test");
@@ -122,7 +118,7 @@ describe("ConsoleProxyControl Tests", () => {
 
   test("bindProxy", () => {
     const logFnMock = jest.fn();
-    consoleProxyControl.proxy.setFunctionHandler("log", logFnMock);
+    proxy.setFunctionHandler("log", logFnMock);
 
     function testFn() {
       proxyTargetMock.log("bindProxy");
