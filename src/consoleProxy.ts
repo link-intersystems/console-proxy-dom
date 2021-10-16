@@ -11,7 +11,7 @@ export type Invocation = {
 export type Handler = (invocation: Invocation) => any;
 
 export type ConsoleProxy = Console & {
-  setDefaultHandler: (handler?: Handler) => void;
+  setDefaultHandler: (handler?: Handler | Partial<Console>) => void;
   setFunctionHandler(
     fnName: ConsoleFunctionName,
     handler: () => any
@@ -77,8 +77,17 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
     };
   }
 
-  function setDefaultHandler(handler: Handler = passthroughHandler) {
-    defaultHandler = handler;
+  function setDefaultHandler(
+    handler: Handler | Partial<Console> = passthroughHandler
+  ) {
+    if (typeof handler === "function") {
+      defaultHandler = handler;
+    } else {
+      defaultHandler = function (invocation: Invocation) {
+        const handlerFn = handler[invocation.targetFnName] as <R>() => R;
+        return handlerFn.apply(handler, invocation.args);
+      };
+    }
   }
 
   function setFunctionHandler(fnName: string, handler: () => any) {

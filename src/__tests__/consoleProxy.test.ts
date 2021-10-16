@@ -68,6 +68,17 @@ describe("ConsoleProxy Tests", () => {
     expect(consoleMock.log).toHaveBeenCalledWith("enabled");
   });
 
+  test("setDefaultHandler partial console", () => {
+    const defaultHandlerMock = jest.fn();
+    consoleProxy.setDefaultHandler({
+      log: defaultHandlerMock,
+    });
+
+    consoleProxy.log("enabled");
+
+    expect(defaultHandlerMock).toHaveBeenCalledWith("enabled");
+  });
+
   test("assert", () => {
     testConsoleMethod("assert", true, {
       msg: "assertCalled",
