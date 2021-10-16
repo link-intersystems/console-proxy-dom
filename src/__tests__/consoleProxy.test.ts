@@ -45,6 +45,29 @@ describe("ConsoleProxy Tests", () => {
     expect(consoleProxy.clear).toBeUndefined();
   });
 
+  test("setDefaultHandler", () => {
+    const defaultHandlerMock = jest.fn();
+    consoleProxy.setDefaultHandler(defaultHandlerMock);
+
+    consoleProxy.log("enabled");
+
+    expect(defaultHandlerMock).toHaveBeenCalledWith({
+      target: consoleMock,
+      targetFn: consoleMock.log,
+      targetFnName: "log",
+      args: ["enabled"],
+    });
+  });
+
+  test("Reset setDefaultHandler", () => {
+    const defaultHandlerMock = jest.fn();
+    consoleProxy.setDefaultHandler(defaultHandlerMock);
+    consoleProxy.setDefaultHandler();
+
+    consoleProxy.log("enabled");
+    expect(consoleMock.log).toHaveBeenCalledWith("enabled");
+  });
+
   test("assert", () => {
     testConsoleMethod("assert", true, {
       msg: "assertCalled",
