@@ -13,6 +13,7 @@ export type ConsoleProxyControl = {
   enableProxy: () => DisableProxy;
   proxy: ConsoleProxy;
   execTemplate<R = any>(fn: () => R): R;
+  bindProxy<R = any>(fn: () => R): () => R;
 };
 
 function createProxyFunctions(target: any): ProxyFunction[] {
@@ -78,11 +79,20 @@ export function createConsoleProxyControl(
     }
   };
 
+  const bindProxy = <R = any>(fn: () => R): (() => R) => {
+    return function () {
+      return execTemplate(() =>
+        (fn as any).apply((fn as any).this, Array.from(arguments))
+      );
+    };
+  };
+
   return {
     isProxyEnabled,
     setProxyEnabled,
     enableProxy: enableProxy,
     proxy: targetConsoleProxy,
     execTemplate,
+    bindProxy,
   };
 }

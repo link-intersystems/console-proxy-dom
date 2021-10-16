@@ -118,4 +118,25 @@ describe("ConsoleProxyControl Tests", () => {
 
     expect(proxyTargetMock.log).not.toBeCalledWith("test");
   });
+
+  test("bindProxy", () => {
+    const logFnMock = jest.fn();
+    consoleProxyControl.proxy.setHandler("log", logFnMock);
+
+    function testFn() {
+      proxyTargetMock.log("bindProxy");
+      return "bindProxy logged";
+    }
+    expect(consoleProxyControl.isProxyEnabled()).toBeFalsy();
+
+    const boundFn = consoleProxyControl.bindProxy(testFn);
+
+    const result = boundFn();
+
+    expect(consoleProxyControl.isProxyEnabled()).toBeFalsy();
+
+    expect(result).toBe("bindProxy logged");
+    expect(logFnMock).toBeCalledWith("bindProxy");
+    expect(proxyTargetMock.log).not.toBeCalledWith("bindProxy");
+  });
 });
