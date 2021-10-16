@@ -34,10 +34,10 @@ export function createLogEnablementHandler(
     log: function () {
       log.apply(this, ["log", Array.from(arguments)]);
     },
-    info: (...args) => log("info", args),
-    warn: (...args) => log("warn", args),
-    error: (...args) => log("error", args),
-    debug: (...args) => log("debug", args),
+    info: (...args: any[]) => log("info", args),
+    warn: (...args: any[]) => log("warn", args),
+    error: (...args: any[]) => log("error", args),
+    debug: (...args: any[]) => log("debug", args),
     setLevelEnabled,
   };
 }
