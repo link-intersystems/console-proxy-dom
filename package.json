@@ -1,0 +1,94 @@
+{
+  "name": "@link-intersystems/console-redirection",
+  "version": "1.0.3",
+  "description": "Easy to use and flexible console redirection library.",
+  "license": "MIT",
+  "keywords": [
+    "console",
+    "redirection"
+  ],
+  "authors": [
+    "René Link <rene.link@link-intersystems.com> (https://stackoverflow.com/users/974186/ren%c3%a9-link?tab=profile)"
+  ],
+  "repository": "github:link-intersystems/console-redirection",
+  "bugs": "https://github.com/link-intersystems/console-redirection/issues",
+  "main": "lib/console-redirection.js",
+  "unpkg": "dist/console-redirection.js",
+  "module": "es/console-redirection.js",
+  "types": "types/index.d.ts",
+  "files": [
+    "dist",
+    "lib",
+    "es",
+    "src",
+    "types"
+  ],
+  "scripts": {
+    "clean": "rimraf lib dist es coverage types",
+    "clean:all": "npm run clean -- node_modules",
+    "format": "prettier --write \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
+    "format:check": "prettier --list-different \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
+    "lint": "eslint --ext js,ts src test",
+    "check-types": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watchAll",
+    "test:cov": "jest --coverage",
+    "build": "rollup -c",
+    "prepublishOnly": "npm run clean && npm run check-types && npm run lint -- --max-warnings 0 && npm test"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.9.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/node": "^7.8.7",
+    "@babel/plugin-external-helpers": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.9.5",
+    "@babel/plugin-transform-runtime": "^7.9.0",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/preset-flow": "^7.9.0",
+    "@babel/preset-typescript": "^7.9.0",
+    "@babel/register": "^7.9.0",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-node-resolve": "^13.0.4",
+    "@rollup/plugin-replace": "^3.0.0",
+    "@types/jest": "^27.0.0",
+    "@types/node": "^16.4.10",
+    "@typescript-eslint/eslint-plugin": "^4.23.0",
+    "@typescript-eslint/parser": "^4.23.0",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^27.0.0",
+    "cross-env": "^7.0.2",
+    "eslint": "^7.26.0",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint-import-resolver-typescript": "^2.0.0",
+    "eslint-plugin-flowtype": "^5.7.2",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.19.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "glob": "^7.1.6",
+    "jest": "^27.0.0",
+    "netlify-plugin-cache": "^1.0.3",
+    "prettier": "2.3.2",
+    "redux-thunk": "^2.3.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.7.2",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "rxjs": "^7.3.0",
+    "ts-jest": "^27.0.4",
+    "typescript": "^4.3.5"
+  },
+  "npmName": "@link-intersystems/console-redirection",
+  "npmFileMap": [
+    {
+      "basePath": "/dist/",
+      "files": [
+        "*.js"
+      ]
+    }
+  ],
+  "sideEffects": false
+}
