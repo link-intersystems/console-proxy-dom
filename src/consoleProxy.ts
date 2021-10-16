@@ -1,8 +1,13 @@
 export type UnregisterHandler = () => void;
 
+export type ConsoleFunctionName = keyof Console;
+
 export type ConsoleProxy = Console & {
   defaultHandler: (fn: any, args: any[]) => any;
-  setHandler(fnName: string, handler: () => any): UnregisterHandler;
+  setHandler(
+    fnName: ConsoleFunctionName,
+    handler: () => any
+  ): UnregisterHandler;
 };
 
 export const consoleFnNames = Object.freeze([
@@ -32,7 +37,7 @@ export const consoleFnNames = Object.freeze([
 ]);
 
 export function createConsoleProxy(console: Console): ConsoleProxy {
-  const consoleCopy = {...console};
+  const consoleCopy = { ...console };
 
   const defaultHandler = (target: Console, fn: any, args: any[]) => {
     return fn.apply(target, args);
@@ -56,7 +61,11 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
         return handler.apply(proxy, arguments);
       }
 
-      defaultHandler(consoleCopy, (consoleCopy as any)[fnName], Array.from(arguments));
+      return defaultHandler(
+        consoleCopy,
+        (consoleCopy as any)[fnName],
+        Array.from(arguments)
+      );
     };
   }
 

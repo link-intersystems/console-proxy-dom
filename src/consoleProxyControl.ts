@@ -2,45 +2,63 @@ import { consoleFnNames, ConsoleProxy, createConsoleProxy } from "consoleProxy";
 
 export type DisableProxy = () => void;
 
+type ProxyFunction = {
+  name: string;
+  fn: any;
+};
+
 export type ConsoleProxyControl = {
+  isProxyEnabled: () => boolean;
   setProxyEnabled: (enabled: boolean) => void;
   enableProxy: () => DisableProxy;
   proxy: ConsoleProxy;
   execTemplate<R = any>(fn: () => R): R;
 };
 
+function createProxyFunctions(target: any): ProxyFunction[] {
+  return consoleFnNames.map((fnName) => {
+    const proxyFn = function () {
+      return (target as any)[fnName].apply(target, arguments);
+    };
+    return {
+      name: fnName,
+      fn: proxyFn,
+    };
+  }, []);
+}
+
 export function createConsoleProxyControl(
   targetConsole = console
 ): ConsoleProxyControl {
+  const origTargetConsole = { ...targetConsole };
   const targetConsoleProxy = createConsoleProxy(targetConsole);
-  const targetConsoleCopy = { ...console };
+
+  const proxyFunctions = createProxyFunctions(targetConsoleProxy);
 
   function isProxyEnabled() {
-    return console === targetConsoleProxy;
+    return proxyFunctions
+      .map((pf) => (targetConsole as any)[pf.name] === pf.fn)
+      .every((e) => e === true);
   }
 
   function setProxyEnabled(enabled: boolean): void {
     if (enabled) {
-      consoleFnNames.forEach((fnName) => {
-        // eslint-disable-next-line no-native-reassign
-        (console as any)[fnName] = function () {
-          return (targetConsoleProxy as any)[fnName].apply(
-            targetConsoleProxy,
-            arguments
-          );
-        };
-      });
+      proxyFunctions.forEach((pf) => ((targetConsole as any)[pf.name] = pf.fn));
     } else {
-      consoleFnNames.forEach((fnName) => {
-        // eslint-disable-next-line no-native-reassign
-        (console as any)[fnName] = (targetConsoleCopy as any)[fnName];
-      });
+      proxyFunctions.forEach(
+        (pf) =>
+          // eslint-disable-next-line no-native-reassign
+          ((targetConsole as any)[pf.name] = (origTargetConsole as any)[
+            pf.name
+          ])
+      );
     }
   }
 
   function enableProxy(): DisableProxy {
     const disableProxy = () => {
-      setProxyEnabled(false);
+      const enabled = isProxyEnabled();
+      if (enabled) setProxyEnabled(false);
     };
 
     if (isProxyEnabled()) {
@@ -61,6 +79,7 @@ export function createConsoleProxyControl(
   };
 
   return {
+    isProxyEnabled,
     setProxyEnabled,
     enableProxy: enableProxy,
     proxy: targetConsoleProxy,

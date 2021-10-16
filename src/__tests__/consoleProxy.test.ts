@@ -1,3 +1,4 @@
+import { ConsoleFunctionName } from "index";
 import {
   consoleFnNames,
   ConsoleProxy,
@@ -31,7 +32,9 @@ describe("ConsoleProxy Tests", () => {
   });
 
   test("setHandler unknown function", () => {
-    expect(() => consoleProxy.setHandler("foobar", () => {})).toThrowError();
+    expect(() =>
+      consoleProxy.setHandler("foobar" as ConsoleFunctionName, () => {})
+    ).toThrowError();
   });
 
   test("do not create function proxies for undefined target functions", () => {
@@ -77,7 +80,12 @@ describe("ConsoleProxy Tests", () => {
   });
 
   test("exception", () => {
-    testConsoleMethod("exception", { name: "someObject" }, "arg1", "arg2");
+    testConsoleMethod(
+      "exception" as ConsoleFunctionName,
+      { name: "someObject" },
+      "arg1",
+      "arg2"
+    );
   });
 
   test("group", () => {
@@ -136,14 +144,14 @@ describe("ConsoleProxy Tests", () => {
     testConsoleMethod("warn", { name: "someObject" }, "arg1", "arg2");
   });
 
-  function testIntercepted(fnName: string, ...args: any[]) {
+  function testIntercepted(fnName: ConsoleFunctionName, ...args: any[]) {
     (consoleProxy as any)[fnName].apply(consoleProxy, args);
 
     expect((consoleMock as any)[fnName]).toHaveBeenCalledTimes(1);
     expect((consoleMock as any)[fnName]).toHaveBeenCalledWith(...args);
   }
 
-  function testNotIntercepted(fnName: string, ...args: any[]) {
+  function testNotIntercepted(fnName: ConsoleFunctionName, ...args: any[]) {
     (consoleMock as any)[fnName] = jest.fn();
 
     const unset = consoleProxy.setHandler(fnName, () => {});
@@ -156,7 +164,7 @@ describe("ConsoleProxy Tests", () => {
     expect((consoleMock as any)[fnName]).not.toHaveBeenCalledWith(...args);
   }
 
-  function testConsoleMethod(fnName: string, ...args: any[]) {
+  function testConsoleMethod(fnName: ConsoleFunctionName, ...args: any[]) {
     testIntercepted(fnName, args);
     testNotIntercepted(fnName, args);
   }

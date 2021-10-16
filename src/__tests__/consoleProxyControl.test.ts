@@ -5,52 +5,68 @@ import {
 import { createConsoleMock } from "./consoleProxy.test";
 
 describe("ConsoleProxyControl Tests", () => {
-  let origConsole: Console;
   let proxyTargetMock: Console;
   let consoleProxyControl: ConsoleProxyControl;
 
-  beforeAll(() => {
-    origConsole = console;
-    // eslint-disable-next-line no-native-reassign
-    console = createConsoleMock();
-  });
-
-  afterAll(() => {
-    // eslint-disable-next-line no-native-reassign
-    console = origConsole;
-  });
-
   beforeEach(() => {
     proxyTargetMock = createConsoleMock();
+
     // eslint-disable-next-line no-native-reassign
     consoleProxyControl = createConsoleProxyControl(proxyTargetMock);
   });
 
   test("enable/disable proxy", () => {
     const disableProxy = consoleProxyControl.enableProxy();
-
-    console.log("enabled");
+    proxyTargetMock.log("enabled");
+    disableProxy();
     expect(proxyTargetMock.log).toHaveBeenCalledWith("enabled");
 
-    disableProxy();
-    console.log("disabled");
+    proxyTargetMock.log("disabled");
+    expect(proxyTargetMock.log).toHaveBeenCalledWith("disabled");
+  });
 
-    expect(proxyTargetMock.log).not.toHaveBeenCalledWith("disabled");
-    expect(console.log).toHaveBeenCalledWith("disabled");
+  test("createConsoleProxyControl with default console", () => {
+    const origConsole = { ...console };
+
+    console.log = jest.fn();
+    try {
+      consoleProxyControl = createConsoleProxyControl();
+
+      const disableProxy = consoleProxyControl.enableProxy();
+      console.log("enabled");
+      disableProxy();
+      expect(console.log).toHaveBeenCalledWith("enabled");
+    } finally {
+      console.log = origConsole.log;
+    }
+  });
+
+  test("enable multiple times", () => {
+    const disableProxy = consoleProxyControl.enableProxy();
+    const disableProxy2 = consoleProxyControl.enableProxy();
+
+    proxyTargetMock.log("enabled");
+    disableProxy();
+
+    expect(proxyTargetMock.log).toHaveBeenCalledWith("enabled");
+
+    disableProxy2();
+    proxyTargetMock.log("disabled");
+
+    expect(proxyTargetMock.log).toHaveBeenCalledWith("disabled");
   });
 
   test("getProxy", () => {
     expect(consoleProxyControl.proxy).toBeDefined();
 
     consoleProxyControl.proxy.log("getProxyTest");
-    
+
     expect(proxyTargetMock.log).toHaveBeenCalledWith("getProxyTest");
-    expect(console.log).not.toHaveBeenCalledWith("getProxyTest");
   });
 
-  test("consoleTemplate", () => {
+  test("execTemplate", () => {
     function testFn() {
-      console.log("test");
+      proxyTargetMock.log("test");
       return "test logged";
     }
 
@@ -58,5 +74,48 @@ describe("ConsoleProxyControl Tests", () => {
 
     expect(result).toBe("test logged");
     expect(proxyTargetMock.log).toBeCalledWith("test");
+  });
+
+  test("redirected Template", () => {
+    const logFnMock = jest.fn();
+    consoleProxyControl.proxy.setHandler("log", logFnMock);
+
+    function testFn() {
+      proxyTargetMock.log("test");
+      return "test logged";
+    }
+    expect(consoleProxyControl.isProxyEnabled()).toBeFalsy();
+
+    const result = consoleProxyControl.execTemplate(testFn);
+
+    expect(consoleProxyControl.isProxyEnabled()).toBeFalsy();
+
+    expect(result).toBe("test logged");
+    expect(logFnMock).toBeCalledWith("test");
+    expect(proxyTargetMock.log).not.toBeCalledWith("test");
+  });
+
+  test("redirected template - proxy already enabled", () => {
+    const logFnMock = jest.fn();
+    consoleProxyControl.proxy.setHandler("log", logFnMock);
+
+    function testFn() {
+      proxyTargetMock.log("test");
+      return "test logged";
+    }
+
+    consoleProxyControl.setProxyEnabled(true);
+    expect(consoleProxyControl.isProxyEnabled()).toBeTruthy();
+
+    const result = consoleProxyControl.execTemplate(testFn);
+
+    expect(result).toBe("test logged");
+    expect(logFnMock).toBeCalledWith("test");
+
+    // still enabled
+    expect(consoleProxyControl.isProxyEnabled()).toBeTruthy();
+    consoleProxyControl.setProxyEnabled(false);
+
+    expect(proxyTargetMock.log).not.toBeCalledWith("test");
   });
 });
