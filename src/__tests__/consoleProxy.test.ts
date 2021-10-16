@@ -1,8 +1,8 @@
-import { ConsoleFunctionName } from "index";
 import {
   consoleFnNames,
   ConsoleProxy,
   createConsoleProxy,
+  ConsoleFunctionName,
 } from "../consoleProxy";
 
 export function createConsoleMock() {

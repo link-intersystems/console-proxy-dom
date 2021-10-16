@@ -2,7 +2,7 @@ import { ConsoleProxy, createConsoleProxy } from "consoleProxy";
 import {
   ConsoleProxyControl,
   createConsoleProxyControl,
-} from "../consoleProxyControl";
+} from "consoleProxyControl";
 import { createConsoleMock } from "./consoleProxy.test";
 
 describe("ConsoleProxyControl Tests", () => {
@@ -82,13 +82,11 @@ describe("ConsoleProxyControl Tests", () => {
       return "test logged " + result2;
     }
 
-
     const result = consoleProxyControl.execTemplate(testFn);
 
     expect(result).toBe("test logged test2 logged");
     expect(logFnMock).toBeCalledWith("test");
     expect(logFnMock).toBeCalledWith("test2");
-
   });
 
   test("bindProxy", () => {
