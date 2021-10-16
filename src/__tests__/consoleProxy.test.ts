@@ -119,7 +119,7 @@ describe("ConsoleProxy Tests", () => {
   test("getTargetConsole", () => {
     const targetConsole = consoleProxy.getTargetConsole();
 
-    expect(targetConsole).toEqual(consoleMock);
+    expect(targetConsole).toBe(consoleMock);
   });
 
   test("assert", () => {

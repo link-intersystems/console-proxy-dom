@@ -57,7 +57,7 @@ export function createConsoleProxy(
 ): ConsoleProxy {
   const origTargetConsoleFunctions = { ...targetConsole };
 
-  const getTargetConsole = () => origTargetConsoleFunctions;
+  const getTargetConsole = () => targetConsole;
 
   let defaultHandler: Handler;
 

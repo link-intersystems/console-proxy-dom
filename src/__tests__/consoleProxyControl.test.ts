@@ -1,3 +1,4 @@
+import { createConsoleProxy } from "consoleProxy";
 import {
   ConsoleProxyControl,
   createConsoleProxyControl,
@@ -11,8 +12,8 @@ describe("ConsoleProxyControl Tests", () => {
   beforeEach(() => {
     proxyTargetMock = createConsoleMock();
 
-    // eslint-disable-next-line no-native-reassign
-    consoleProxyControl = createConsoleProxyControl(proxyTargetMock);
+    const proxy = createConsoleProxy(proxyTargetMock);
+    consoleProxyControl = createConsoleProxyControl(proxy);
   });
 
   test("enable/disable proxy", () => {
