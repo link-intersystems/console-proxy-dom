@@ -78,7 +78,7 @@ describe("ConsoleProxyControl Tests", () => {
 
   test("redirected Template", () => {
     const logFnMock = jest.fn();
-    consoleProxyControl.proxy.setHandler("log", logFnMock);
+    consoleProxyControl.proxy.setFunctionHandler("log", logFnMock);
 
     function testFn() {
       proxyTargetMock.log("test");
@@ -97,7 +97,7 @@ describe("ConsoleProxyControl Tests", () => {
 
   test("redirected template - proxy already enabled", () => {
     const logFnMock = jest.fn();
-    consoleProxyControl.proxy.setHandler("log", logFnMock);
+    consoleProxyControl.proxy.setFunctionHandler("log", logFnMock);
 
     function testFn() {
       proxyTargetMock.log("test");
@@ -121,7 +121,7 @@ describe("ConsoleProxyControl Tests", () => {
 
   test("bindProxy", () => {
     const logFnMock = jest.fn();
-    consoleProxyControl.proxy.setHandler("log", logFnMock);
+    consoleProxyControl.proxy.setFunctionHandler("log", logFnMock);
 
     function testFn() {
       proxyTargetMock.log("bindProxy");

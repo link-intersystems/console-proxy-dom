@@ -2,9 +2,17 @@ export type UnregisterHandler = () => void;
 
 export type ConsoleFunctionName = keyof Console;
 
+export type Invocation = {
+  target: Console;
+  targetFn: () => any;
+  targetFnName: ConsoleFunctionName;
+  args: [];
+};
+export type Handler = (invocation: Invocation) => any;
+
 export type ConsoleProxy = Console & {
   defaultHandler: (fn: any, args: any[]) => any;
-  setHandler(
+  setFunctionHandler(
     fnName: ConsoleFunctionName,
     handler: () => any
   ): UnregisterHandler;
@@ -43,14 +51,18 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
     return fn.apply(target, args);
   };
 
-  const fnHandlers = new Map();
+  const fnHandlers = new Map<string, Handler>();
 
-  function getHandler(fnName: string): any {
+  function getHandler(fnName: string): Handler | undefined {
     return fnHandlers.get(fnName);
   }
 
-  function createProxyFn(proxy: ConsoleProxy, fnName: string): any {
-    if (!(console as any)[fnName]) {
+  function createProxyFn(
+    proxy: ConsoleProxy,
+    fnName: ConsoleFunctionName
+  ): any {
+    const targetFn = (console as any)[fnName];
+    if (targetFn === undefined || typeof targetFn !== "function") {
       return undefined;
     }
 
@@ -58,7 +70,12 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
       const handler = getHandler(fnName);
 
       if (handler) {
-        return handler.apply(proxy, arguments);
+        return handler({
+          target: console,
+          targetFn,
+          targetFnName: fnName,
+          args: Array.from(arguments) as [],
+        });
       }
 
       return defaultHandler(
@@ -69,26 +86,31 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
     };
   }
 
-  function setHandler(fnName: string, handler: () => any) {
+  function setFunctionHandler(fnName: string, handler: () => any) {
     if (!(fnName in console)) {
       const msg = `Console doesn't have a function named ${fnName}`;
       throw new Error(msg);
     }
 
-    fnHandlers.set(fnName, handler);
+    const handlerFunction = function (invocation: Invocation) {
+      return handler.apply(proxy, invocation.args);
+    };
+
+    fnHandlers.set(fnName, handlerFunction);
     return () => {
       fnHandlers.delete(fnName);
     };
   }
+
   const proxy = consoleFnNames.reduce((proxy, fn) => {
-    const proxyFn = createProxyFn(proxy, fn);
+    const proxyFn = createProxyFn(proxy, fn as ConsoleFunctionName);
     if (proxyFn) {
       (proxy as any)[fn] = proxyFn.bind(proxy);
     }
     return proxy;
   }, {} as ConsoleProxy);
 
-  proxy.setHandler = setHandler;
+  proxy.setFunctionHandler = setFunctionHandler;
 
   return proxy;
 }

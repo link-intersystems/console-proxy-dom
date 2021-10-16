@@ -33,7 +33,7 @@ describe("ConsoleProxy Tests", () => {
 
   test("setHandler unknown function", () => {
     expect(() =>
-      consoleProxy.setHandler("foobar" as ConsoleFunctionName, () => {})
+      consoleProxy.setFunctionHandler("foobar" as ConsoleFunctionName, () => {})
     ).toThrowError();
   });
 
@@ -154,7 +154,7 @@ describe("ConsoleProxy Tests", () => {
   function testNotIntercepted(fnName: ConsoleFunctionName, ...args: any[]) {
     (consoleMock as any)[fnName] = jest.fn();
 
-    const unset = consoleProxy.setHandler(fnName, () => {});
+    const unset = consoleProxy.setFunctionHandler(fnName, () => {});
     try {
       (consoleProxy as any)[fnName].apply(consoleProxy, args);
     } finally {
