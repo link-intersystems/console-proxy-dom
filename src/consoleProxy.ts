@@ -2,13 +2,13 @@ export type UnregisterHandler = () => void;
 
 export type ConsoleFunctionName = keyof Console;
 
-export type Invocation = {
+export type HandlerInvocation = {
   target: Console;
   targetFn: () => any;
   targetFnName: ConsoleFunctionName;
   args: [];
 };
-export type Handler = (invocation: Invocation) => any;
+export type Handler = (invocation: HandlerInvocation) => any;
 
 export type DefaultHandler = Handler | Partial<Console>;
 
@@ -18,6 +18,7 @@ export type ConsoleProxy = Console & {
     fnName: ConsoleFunctionName,
     handler: () => any
   ): UnregisterHandler;
+  getTargetConsole: () => Console;
 };
 
 export const consoleFnNames = Object.freeze([
@@ -46,15 +47,17 @@ export const consoleFnNames = Object.freeze([
   "warn",
 ]);
 
-const passthroughHandler = (invocation: Invocation) => {
+const passthroughHandler = (invocation: HandlerInvocation) => {
   return invocation.targetFn.apply(invocation.target, invocation.args);
 };
 
 export function createConsoleProxy(
   targetConsole: Console = console,
-  _defaultHandler: DefaultHandler = passthroughHandler
+  defaultHandlerArg: DefaultHandler = passthroughHandler
 ): ConsoleProxy {
-  const origTargetConsole = { ...targetConsole };
+  const origTargetConsoleFunctions = { ...targetConsole };
+
+  const getTargetConsole = () => origTargetConsoleFunctions;
 
   let defaultHandler: Handler;
 
@@ -66,7 +69,7 @@ export function createConsoleProxy(
   }
 
   function createProxyFn(fnName: ConsoleFunctionName): any {
-    const targetFn = (targetConsole as any)[fnName];
+    const targetFn = (origTargetConsoleFunctions as any)[fnName];
     if (targetFn === undefined || typeof targetFn !== "function") {
       return undefined;
     }
@@ -75,7 +78,7 @@ export function createConsoleProxy(
       const handler = getHandler(fnName);
 
       return handler({
-        target: origTargetConsole,
+        target: origTargetConsoleFunctions,
         targetFn,
         targetFnName: fnName,
         args: Array.from(arguments) as [],
@@ -89,7 +92,7 @@ export function createConsoleProxy(
     if (typeof handler === "function") {
       defaultHandler = handler;
     } else {
-      defaultHandler = function (invocation: Invocation) {
+      defaultHandler = function (invocation: HandlerInvocation) {
         const handlerFn = handler[invocation.targetFnName] as <R>() => R;
         return handlerFn.apply(handler, invocation.args);
       };
@@ -102,7 +105,7 @@ export function createConsoleProxy(
       throw new Error(msg);
     }
 
-    const handlerFunction = function (invocation: Invocation) {
+    const handlerFunction = function (invocation: HandlerInvocation) {
       return handler.apply(proxy, invocation.args);
     };
 
@@ -120,10 +123,11 @@ export function createConsoleProxy(
     return proxy;
   }, {} as ConsoleProxy);
 
-  setDefaultHandler(_defaultHandler);
+  setDefaultHandler(defaultHandlerArg);
 
   proxy.setFunctionHandler = setFunctionHandler;
   proxy.setDefaultHandler = setDefaultHandler;
+  proxy.getTargetConsole = getTargetConsole;
 
   return proxy;
 }

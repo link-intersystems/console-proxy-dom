@@ -116,6 +116,12 @@ describe("ConsoleProxy Tests", () => {
     expect(consoleMock.log).not.toHaveBeenCalledWith("enabled");
   });
 
+  test("getTargetConsole", () => {
+    const targetConsole = consoleProxy.getTargetConsole();
+
+    expect(targetConsole).toEqual(consoleMock);
+  });
+
   test("assert", () => {
     testConsoleMethod("assert", true, {
       msg: "assertCalled",

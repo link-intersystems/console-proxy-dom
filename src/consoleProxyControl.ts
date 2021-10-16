@@ -29,10 +29,10 @@ function createProxyFunctions(target: any): ProxyFunction[] {
 }
 
 export function createConsoleProxyControl(
-  targetConsole = console
+  targetConsole = console,
+  targetConsoleProxy = createConsoleProxy(targetConsole)
 ): ConsoleProxyControl {
   const origTargetConsole = { ...targetConsole };
-  const targetConsoleProxy = createConsoleProxy(targetConsole);
 
   const proxyFunctions = createProxyFunctions(targetConsoleProxy);
 
