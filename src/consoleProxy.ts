@@ -32,6 +32,8 @@ export const consoleFnNames = Object.freeze([
 ]);
 
 export function createConsoleProxy(console: Console): ConsoleProxy {
+  const consoleCopy = {...console};
+
   const defaultHandler = (target: Console, fn: any, args: any[]) => {
     return fn.apply(target, args);
   };
@@ -54,7 +56,7 @@ export function createConsoleProxy(console: Console): ConsoleProxy {
         return handler.apply(proxy, arguments);
       }
 
-      defaultHandler(console, (console as any)[fnName], Array.from(arguments));
+      defaultHandler(consoleCopy, (consoleCopy as any)[fnName], Array.from(arguments));
     };
   }
 

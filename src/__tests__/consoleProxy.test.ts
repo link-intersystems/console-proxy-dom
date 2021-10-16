@@ -137,8 +137,6 @@ describe("ConsoleProxy Tests", () => {
   });
 
   function testIntercepted(fnName: string, ...args: any[]) {
-    (consoleMock as any)[fnName] = jest.fn();
-
     (consoleProxy as any)[fnName].apply(consoleProxy, args);
 
     expect((consoleMock as any)[fnName]).toHaveBeenCalledTimes(1);

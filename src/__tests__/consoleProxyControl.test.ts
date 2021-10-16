@@ -6,39 +6,57 @@ import { createConsoleMock } from "./consoleProxy.test";
 
 describe("ConsoleProxyControl Tests", () => {
   let origConsole: Console;
-  let consoleMock: Console;
+  let proxyTargetMock: Console;
   let consoleProxyControl: ConsoleProxyControl;
 
-  beforeEach(() => {
+  beforeAll(() => {
     origConsole = console;
-    consoleMock = createConsoleMock();
     // eslint-disable-next-line no-native-reassign
-    console = consoleMock;
-    consoleProxyControl = createConsoleProxyControl();
+    console = createConsoleMock();
   });
 
-  afterEach(() => {
+  afterAll(() => {
     // eslint-disable-next-line no-native-reassign
     console = origConsole;
   });
 
+  beforeEach(() => {
+    proxyTargetMock = createConsoleMock();
+    // eslint-disable-next-line no-native-reassign
+    consoleProxyControl = createConsoleProxyControl(proxyTargetMock);
+  });
+
   test("enable/disable proxy", () => {
-    expect(console).toBe(consoleMock);
+    const disableProxy = consoleProxyControl.enableProxy();
 
-    consoleProxyControl.setProxyEnabled(true);
+    console.log("enabled");
+    expect(proxyTargetMock.log).toHaveBeenCalledWith("enabled");
 
-    expect(console).not.toBe(consoleMock);
+    disableProxy();
+    console.log("disabled");
 
-    consoleProxyControl.setProxyEnabled(false);
-
-    expect(console).toBe(consoleMock);
+    expect(proxyTargetMock.log).not.toHaveBeenCalledWith("disabled");
+    expect(console.log).toHaveBeenCalledWith("disabled");
   });
 
   test("getProxy", () => {
-    expect(console).toBe(consoleMock);
+    expect(consoleProxyControl.proxy).toBeDefined();
 
-    consoleProxyControl.setProxyEnabled(true);
+    consoleProxyControl.proxy.log("getProxyTest");
+    
+    expect(proxyTargetMock.log).toHaveBeenCalledWith("getProxyTest");
+    expect(console.log).not.toHaveBeenCalledWith("getProxyTest");
+  });
 
-    expect(console).toBe(consoleProxyControl.getProxy());
+  test("consoleTemplate", () => {
+    function testFn() {
+      console.log("test");
+      return "test logged";
+    }
+
+    const result = consoleProxyControl.execTemplate(testFn);
+
+    expect(result).toBe("test logged");
+    expect(proxyTargetMock.log).toBeCalledWith("test");
   });
 });
