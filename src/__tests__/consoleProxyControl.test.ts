@@ -17,16 +17,6 @@ describe("ConsoleProxyControl Tests", () => {
     consoleProxyControl = createConsoleProxyControl(proxy);
   });
 
-  test("enable/disable proxy", () => {
-    const disableProxy = consoleProxyControl.enableProxy();
-    proxyTargetMock.log("enabled");
-    disableProxy();
-    expect(proxyTargetMock.log).toHaveBeenCalledWith("enabled");
-
-    proxyTargetMock.log("disabled");
-    expect(proxyTargetMock.log).toHaveBeenCalledWith("disabled");
-  });
-
   test("createConsoleProxyControl with default console", () => {
     const origConsole = { ...console };
 
@@ -40,21 +30,6 @@ describe("ConsoleProxyControl Tests", () => {
     } finally {
       console.log = origConsole.log;
     }
-  });
-
-  test("enable multiple times", () => {
-    const disableProxy = consoleProxyControl.enableProxy();
-    const disableProxy2 = consoleProxyControl.enableProxy();
-
-    proxyTargetMock.log("enabled");
-    disableProxy();
-
-    expect(proxyTargetMock.log).toHaveBeenCalledWith("enabled");
-
-    disableProxy2();
-    proxyTargetMock.log("disabled");
-
-    expect(proxyTargetMock.log).toHaveBeenCalledWith("disabled");
   });
 
   test("getProxy", () => {
@@ -96,24 +71,24 @@ describe("ConsoleProxyControl Tests", () => {
     const logFnMock = jest.fn();
     proxy.setFunctionHandler("log", logFnMock);
 
-    function testFn() {
-      proxyTargetMock.log("test");
-      return "test logged";
+    function testFn2() {
+      proxyTargetMock.log("test2");
+      return "test2 logged";
     }
 
-    consoleProxyControl.setProxyEnabled(true);
-    expect(consoleProxyControl.isProxyEnabled()).toBeTruthy();
+    function testFn() {
+      const result2 = consoleProxyControl.execTemplate(testFn2);
+      proxyTargetMock.log("test");
+      return "test logged " + result2;
+    }
+
 
     const result = consoleProxyControl.execTemplate(testFn);
 
-    expect(result).toBe("test logged");
+    expect(result).toBe("test logged test2 logged");
     expect(logFnMock).toBeCalledWith("test");
+    expect(logFnMock).toBeCalledWith("test2");
 
-    // still enabled
-    expect(consoleProxyControl.isProxyEnabled()).toBeTruthy();
-    consoleProxyControl.setProxyEnabled(false);
-
-    expect(proxyTargetMock.log).not.toBeCalledWith("test");
   });
 
   test("bindProxy", () => {

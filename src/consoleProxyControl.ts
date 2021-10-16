@@ -9,8 +9,6 @@ type ProxyFunction = {
 
 export type ConsoleProxyControl = {
   isProxyEnabled: () => boolean;
-  setProxyEnabled: (enabled: boolean) => void;
-  enableProxy: () => DisableProxy;
   getProxy: () => ConsoleProxy;
   execTemplate<R = any>(fn: () => R): R;
   bindProxy<R = any>(fn: () => R): () => R;
@@ -42,10 +40,8 @@ export function createConsoleProxyControl(
       .every((e) => e === true);
   }
 
-  function setProxyEnabled(enabled: boolean): void {
-    if (enabled) {
-      proxyFunctions.forEach((pf) => ((targetConsole as any)[pf.name] = pf.fn));
-    } else {
+  function enableProxy(): DisableProxy {
+    const disableProxy = () => {
       proxyFunctions.forEach(
         (pf) =>
           // eslint-disable-next-line no-native-reassign
@@ -53,20 +49,9 @@ export function createConsoleProxyControl(
             pf.name
           ])
       );
-    }
-  }
-
-  function enableProxy(): DisableProxy {
-    const disableProxy = () => {
-      const enabled = isProxyEnabled();
-      if (enabled) setProxyEnabled(false);
     };
 
-    if (isProxyEnabled()) {
-      return disableProxy;
-    }
-
-    setProxyEnabled(true);
+    proxyFunctions.forEach((pf) => ((targetConsole as any)[pf.name] = pf.fn));
     return disableProxy;
   }
 
@@ -89,8 +74,6 @@ export function createConsoleProxyControl(
 
   return {
     isProxyEnabled,
-    setProxyEnabled,
-    enableProxy: enableProxy,
     getProxy: () => consoleProxy,
     execTemplate,
     bindProxy,
