@@ -1,39 +1,54 @@
-import { ConsoleProxy, createConsoleProxy } from "../consoleProxy";
 import {
-  ConsoleProxyControl,
-  createConsoleProxyControl,
-} from "../consoleProxyControl";
-import { createConsoleMock } from "./consoleProxy.test";
+  ConsoleFunctionName,
+  ConsoleProxy,
+  createConsoleProxy,
+} from "../../proxy/consoleProxy";
+import { createConsoleTemplate, ConsoleTemplate } from "../consoleTemplate";
+import { createConsoleMock } from "../../proxy/__tests__/consoleProxy.test";
+import exp from "constants";
 
 describe("ConsoleProxyControl Tests", () => {
   let proxyTargetMock: Console;
   let proxy: ConsoleProxy;
-  let consoleProxyControl: ConsoleProxyControl;
+  let consoleTemplate: ConsoleTemplate;
+  let origConsole: Console;
 
   beforeEach(() => {
+    origConsole = { ...console };
     proxyTargetMock = createConsoleMock();
 
     proxy = createConsoleProxy(proxyTargetMock);
-    consoleProxyControl = createConsoleProxyControl(proxy);
+    consoleTemplate = createConsoleTemplate(proxy);
   });
 
-  test("createConsoleProxyControl with default console", () => {
-    const origConsole = { ...console };
+  afterEach(expectConsoleEqualsConsoleBeforeTest);
 
+  function expectConsoleEqualsConsoleBeforeTest() {
+    const consoleEntries = Object.entries(console);
+    const origConsoleEntries = Object.entries(origConsole);
+
+    expect(consoleEntries).toHaveLength(origConsoleEntries.length);
+
+    const origConsoleEntriesMap = new Map(origConsoleEntries);
+
+    consoleEntries.forEach(([key, value]) => {
+      const origValue = origConsoleEntriesMap.get(key);
+      expect(value).toEqual(origValue);
+    });
+  }
+
+  test("createConsoleProxyControl with default console", () => {
     console.log = jest.fn();
     try {
-      consoleProxyControl = createConsoleProxyControl();
+      const consoleProxy = createConsoleProxy();
+      consoleTemplate = createConsoleTemplate(consoleProxy);
 
-      consoleProxyControl.execTemplate(() => console.log("enabled"));
+      consoleTemplate.execFn(() => console.log("enabled"));
 
       expect(console.log).toHaveBeenCalledWith("enabled");
     } finally {
       console.log = origConsole.log;
     }
-  });
-
-  test("getProxy", () => {
-    expect(consoleProxyControl.getProxy()).toBe(proxy);
   });
 
   test("execTemplate", () => {
@@ -42,7 +57,7 @@ describe("ConsoleProxyControl Tests", () => {
       return "test logged";
     }
 
-    const result = consoleProxyControl.execTemplate(testFn);
+    const result = consoleTemplate.execFn(testFn);
 
     expect(result).toBe("test logged");
     expect(proxyTargetMock.log).toBeCalledWith("test");
@@ -56,11 +71,7 @@ describe("ConsoleProxyControl Tests", () => {
       proxyTargetMock.log("test");
       return "test logged";
     }
-    expect(consoleProxyControl.isProxyEnabled()).toBeFalsy();
-
-    const result = consoleProxyControl.execTemplate(testFn);
-
-    expect(consoleProxyControl.isProxyEnabled()).toBeFalsy();
+    const result = consoleTemplate.execFn(testFn);
 
     expect(result).toBe("test logged");
     expect(logFnMock).toBeCalledWith("test");
@@ -77,12 +88,12 @@ describe("ConsoleProxyControl Tests", () => {
     }
 
     function testFn() {
-      const result2 = consoleProxyControl.execTemplate(testFn2);
+      const result2 = consoleTemplate.execFn(testFn2);
       proxyTargetMock.log("test");
       return "test logged " + result2;
     }
 
-    const result = consoleProxyControl.execTemplate(testFn);
+    const result = consoleTemplate.execFn(testFn);
 
     expect(result).toBe("test logged test2 logged");
     expect(logFnMock).toBeCalledWith("test");
@@ -97,13 +108,9 @@ describe("ConsoleProxyControl Tests", () => {
       proxyTargetMock.log("bindProxy");
       return "bindProxy logged";
     }
-    expect(consoleProxyControl.isProxyEnabled()).toBeFalsy();
-
-    const boundFn = consoleProxyControl.bindProxy(testFn);
+    const boundFn = consoleTemplate.bindProxy(testFn);
 
     const result = boundFn();
-
-    expect(consoleProxyControl.isProxyEnabled()).toBeFalsy();
 
     expect(result).toBe("bindProxy logged");
     expect(logFnMock).toBeCalledWith("bindProxy");

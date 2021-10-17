@@ -70,9 +70,6 @@ export function createConsoleProxy(
 
   function createProxyFn(fnName: ConsoleFunctionName): any {
     const targetFn = (origTargetConsoleFunctions as any)[fnName];
-    if (targetFn === undefined || typeof targetFn !== "function") {
-      return undefined;
-    }
 
     return function () {
       const handler = getHandler(fnName);
@@ -116,8 +113,8 @@ export function createConsoleProxy(
   }
 
   const proxy = consoleFnNames.reduce((proxy, fn) => {
-    const proxyFn = createProxyFn(fn as ConsoleFunctionName);
-    if (proxyFn) {
+    if (origTargetConsoleFunctions[fn as ConsoleFunctionName]) {
+      const proxyFn = createProxyFn(fn as ConsoleFunctionName);
       (proxy as any)[fn] = proxyFn.bind(proxy);
     }
     return proxy;

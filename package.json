@@ -1,6 +1,6 @@
 {
   "name": "@link-intersystems/console-redirection",
-  "version": "1.0.3",
+  "version": "1.0.0",
   "description": "Easy to use and flexible console redirection library.",
   "license": "MIT",
   "keywords": [
@@ -19,7 +19,6 @@
   "files": [
     "dist",
     "lib",
-    "es",
     "src",
     "types"
   ],
@@ -28,13 +27,13 @@
     "clean:all": "npm run clean -- node_modules",
     "format": "prettier --write \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
     "format:check": "prettier --list-different \"{src,test}/**/*.{js,ts}\" \"**/*.md\"",
-    "lint": "eslint --ext js,ts src test",
+    "lint": "eslint --ext js,ts src",
     "check-types": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watchAll",
     "test:cov": "jest --coverage",
     "build": "rollup -c",
-    "prepublishOnly": "npm run clean && npm run check-types && npm run lint -- --max-warnings 0 && npm test"
+    "prepublishOnly": "npm run clean && npm run check-types && npm run lint -- --max-warnings 0 && npm test && npm run build"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",

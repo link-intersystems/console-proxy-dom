@@ -1,8 +1,8 @@
+import { createConsoleMock } from "../../proxy/__tests__/consoleProxy.test";
 import {
   createLogEnablementHandler,
   LogEnablementHandler,
 } from "../consoleHandlers";
-import { createConsoleMock } from "./consoleProxy.test";
 
 describe("ConsoleHandler Tests", () => {
   let consoleMock: Console;

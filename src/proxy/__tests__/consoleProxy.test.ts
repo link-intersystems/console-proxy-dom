@@ -1,3 +1,4 @@
+import exp from "constants";
 import {
   consoleFnNames,
   ConsoleProxy,
@@ -120,6 +121,18 @@ describe("ConsoleProxy Tests", () => {
     const targetConsole = consoleProxy.getTargetConsole();
 
     expect(targetConsole).toBe(consoleMock);
+  });
+  test("proxy only has methods of target console", () => {
+    consoleProxy = createConsoleProxy({ log: () => null } as any as Console);
+
+    const notContainedConsoleFns = [...consoleFnNames].filter(
+      (fn) => fn !== "log"
+    );
+    expect(Object.keys(consoleProxy)).toContain("log");
+
+    notContainedConsoleFns.forEach((fn) =>
+      expect(Object.keys(consoleProxy)).not.toContain(fn)
+    );
   });
 
   test("assert", () => {

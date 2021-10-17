@@ -1,8 +1,4 @@
-import {
-  consoleFnNames,
-  ConsoleProxy,
-  createConsoleProxy,
-} from "./consoleProxy";
+import { consoleFnNames, ConsoleProxy } from "../proxy/consoleProxy";
 
 export type DisableProxy = () => void;
 
@@ -11,28 +7,36 @@ type ProxyFunction = {
   fn: any;
 };
 
-export type ConsoleProxyControl = {
-  isProxyEnabled: () => boolean;
-  getProxy: () => ConsoleProxy;
-  execTemplate<R = any>(fn: () => R): R;
-  bindProxy<A = any, R = any>(fn: (...args: A[]) => R): (...args: A[]) => R;
+type ANY_FN<A = any, R = any> = (
+  fn: (...args: A[]) => R
+) => (...args: A[]) => R;
+
+export type ConsoleTemplate = {
+  execFn: ANY_FN;
+  bindProxy: ANY_FN;
 };
 
 function createProxyFunctions(target: any): ProxyFunction[] {
-  return consoleFnNames.map((fnName) => {
-    const proxyFn = function () {
-      return (target as any)[fnName].apply(target, arguments);
-    };
-    return {
-      name: fnName,
-      fn: proxyFn,
-    };
-  }, []);
+  const proxyFunctions: ProxyFunction[] = [];
+
+  consoleFnNames.forEach((fnName) => {
+    if (typeof target[fnName] === "function") {
+      const proxyFn = function () {
+        return (target as any)[fnName].apply(target, arguments);
+      };
+      proxyFunctions.push({
+        name: fnName,
+        fn: proxyFn,
+      });
+    }
+  });
+
+  return proxyFunctions;
 }
 
-export function createConsoleProxyControl(
-  consoleProxy: ConsoleProxy = createConsoleProxy()
-): ConsoleProxyControl {
+export function createConsoleTemplate(
+  consoleProxy: ConsoleProxy
+): ConsoleTemplate {
   const targetConsole = consoleProxy.getTargetConsole();
   const origTargetConsole = { ...targetConsole };
 
@@ -59,7 +63,7 @@ export function createConsoleProxyControl(
     return disableProxy;
   }
 
-  const execTemplate = <R = any>(fn: () => R): R => {
+  const execFn = <R = any>(fn: () => R): R => {
     const disableProxy = isProxyEnabled() ? () => null : enableProxy();
     try {
       return fn();
@@ -70,16 +74,14 @@ export function createConsoleProxyControl(
 
   const bindProxy = <R = any>(fn: () => R): (() => R) => {
     return function () {
-      return execTemplate(() =>
+      return execFn(() =>
         (fn as any).apply((fn as any).this, Array.from(arguments))
       );
     };
   };
 
   return {
-    isProxyEnabled,
-    getProxy: () => consoleProxy,
-    execTemplate,
+    execFn,
     bindProxy,
   };
 }
