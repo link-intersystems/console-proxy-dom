@@ -108,9 +108,9 @@ describe("ConsoleProxyControl Tests", () => {
       proxyTargetMock.log("bindProxy");
       return "bindProxy logged";
     }
-    const boundFn = consoleTemplate.bindProxy(testFn);
+    const wrappedFn = consoleTemplate.wrapFn(testFn);
 
-    const result = boundFn();
+    const result = wrappedFn();
 
     expect(result).toBe("bindProxy logged");
     expect(logFnMock).toBeCalledWith("bindProxy");

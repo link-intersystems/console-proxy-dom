@@ -13,7 +13,7 @@ type ANY_FN<A = any, R = any> = (
 
 export type ConsoleTemplate = {
   execFn: ANY_FN;
-  bindProxy: ANY_FN;
+  wrapFn: ANY_FN;
 };
 
 function createProxyFunctions(target: any): ProxyFunction[] {
@@ -72,7 +72,7 @@ export function createConsoleTemplate(
     }
   };
 
-  const bindProxy = <R = any>(fn: () => R): (() => R) => {
+  const wrapFn = <R = any>(fn: () => R): (() => R) => {
     return function () {
       return execFn(() =>
         (fn as any).apply((fn as any).this, Array.from(arguments))
@@ -82,6 +82,6 @@ export function createConsoleTemplate(
 
   return {
     execFn,
-    bindProxy,
+    wrapFn,
   };
 }
