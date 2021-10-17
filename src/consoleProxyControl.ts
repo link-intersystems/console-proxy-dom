@@ -1,4 +1,8 @@
-import { consoleFnNames, ConsoleProxy, createConsoleProxy } from "consoleProxy";
+import {
+  consoleFnNames,
+  ConsoleProxy,
+  createConsoleProxy,
+} from "./consoleProxy";
 
 export type DisableProxy = () => void;
 
@@ -11,7 +15,7 @@ export type ConsoleProxyControl = {
   isProxyEnabled: () => boolean;
   getProxy: () => ConsoleProxy;
   execTemplate<R = any>(fn: () => R): R;
-  bindProxy<R = any>(fn: () => R): () => R;
+  bindProxy<A = any, R = any>(fn: (...args: A[]) => R): (...args: A[]) => R;
 };
 
 function createProxyFunctions(target: any): ProxyFunction[] {

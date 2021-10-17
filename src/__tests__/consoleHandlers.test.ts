@@ -30,6 +30,70 @@ describe("ConsoleHandler Tests", () => {
     expect(consoleMock.error).toHaveBeenCalledWith("error1", "error2");
   });
 
+  test("logEnablementHandler - disable all levels", () => {
+    logEnablementHandler.setAllLevelsEnabled(false);
+
+    logEnablementHandler.log("log");
+    logEnablementHandler.info("info");
+    logEnablementHandler.warn("warn");
+    logEnablementHandler.debug("debug");
+    logEnablementHandler.error("error");
+
+    expect(consoleMock.log).toHaveBeenCalledTimes(0);
+    expect(consoleMock.info).toHaveBeenCalledTimes(0);
+    expect(consoleMock.warn).toHaveBeenCalledTimes(0);
+    expect(consoleMock.debug).toHaveBeenCalledTimes(0);
+    expect(consoleMock.error).toHaveBeenCalledTimes(0);
+  });
+  test("logEnablementHandler - reenable all levels", () => {
+    logEnablementHandler.setAllLevelsEnabled(false);
+    logEnablementHandler.setAllLevelsEnabled(true);
+
+    logEnablementHandler.log("log");
+    logEnablementHandler.info("info");
+    logEnablementHandler.warn("warn");
+    logEnablementHandler.debug("debug");
+    logEnablementHandler.error("error");
+
+    expect(consoleMock.log).toHaveBeenCalledWith("log");
+    expect(consoleMock.info).toHaveBeenCalledWith("info");
+    expect(consoleMock.warn).toHaveBeenCalledWith("warn");
+    expect(consoleMock.debug).toHaveBeenCalledWith("debug");
+    expect(consoleMock.error).toHaveBeenCalledWith("error");
+  });
+
+  test("logEnablementHandler - disable all levels using all level", () => {
+    logEnablementHandler.setLevelEnabled("all", false);
+
+    logEnablementHandler.log("log");
+    logEnablementHandler.info("info");
+    logEnablementHandler.warn("warn");
+    logEnablementHandler.debug("debug");
+    logEnablementHandler.error("error");
+
+    expect(consoleMock.log).toHaveBeenCalledTimes(0);
+    expect(consoleMock.info).toHaveBeenCalledTimes(0);
+    expect(consoleMock.warn).toHaveBeenCalledTimes(0);
+    expect(consoleMock.debug).toHaveBeenCalledTimes(0);
+    expect(consoleMock.error).toHaveBeenCalledTimes(0);
+  });
+  test("logEnablementHandler - reenable all levels using all level", () => {
+    logEnablementHandler.setLevelEnabled("all", false);
+    logEnablementHandler.setLevelEnabled("all", true);
+
+    logEnablementHandler.log("log");
+    logEnablementHandler.info("info");
+    logEnablementHandler.warn("warn");
+    logEnablementHandler.debug("debug");
+    logEnablementHandler.error("error");
+
+    expect(consoleMock.log).toHaveBeenCalledWith("log");
+    expect(consoleMock.info).toHaveBeenCalledWith("info");
+    expect(consoleMock.warn).toHaveBeenCalledWith("warn");
+    expect(consoleMock.debug).toHaveBeenCalledWith("debug");
+    expect(consoleMock.error).toHaveBeenCalledWith("error");
+  });
+
   test("logEnablementHandler - disable log", () => {
     logEnablementHandler.setLevelEnabled("log", false);
 

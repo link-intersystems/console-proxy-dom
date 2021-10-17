@@ -4,7 +4,8 @@ export type LogEnablementHandler = Pick<
   Console,
   "info" | "warn" | "log" | "debug" | "error"
 > & {
-  setLevelEnabled(level: LogLevel, enabled: boolean): void;
+  setLevelEnabled(level: LogLevel | "all", enabled: boolean): void;
+  setAllLevelsEnabled(enabled: boolean): void;
 };
 
 export function createLogEnablementHandler(
@@ -19,8 +20,20 @@ export function createLogEnablementHandler(
   levelEnablement.set("error", true);
   levelEnablement.set("debug", true);
 
-  const setLevelEnabled = (level: LogLevel, enabled: boolean) => {
-    levelEnablement.set(level, enabled);
+  const setAllLevelsEnabled = (enabled: boolean) => {
+    levelEnablement.set("log", enabled);
+    levelEnablement.set("info", enabled);
+    levelEnablement.set("warn", enabled);
+    levelEnablement.set("error", enabled);
+    levelEnablement.set("debug", enabled);
+  };
+
+  const setLevelEnabled = (level: LogLevel | "all", enabled: boolean) => {
+    if (level === "all") {
+      setAllLevelsEnabled(enabled);
+    } else {
+      levelEnablement.set(level, enabled);
+    }
   };
 
   function log(level: LogLevel, args: any[]) {
@@ -39,5 +52,6 @@ export function createLogEnablementHandler(
     error: (...args: any[]) => log("error", args),
     debug: (...args: any[]) => log("debug", args),
     setLevelEnabled,
+    setAllLevelsEnabled,
   };
 }

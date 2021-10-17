@@ -1,8 +1,8 @@
-import { ConsoleProxy, createConsoleProxy } from "consoleProxy";
+import { ConsoleProxy, createConsoleProxy } from "../consoleProxy";
 import {
   ConsoleProxyControl,
   createConsoleProxyControl,
-} from "consoleProxyControl";
+} from "../consoleProxyControl";
 import { createConsoleMock } from "./consoleProxy.test";
 
 describe("ConsoleProxyControl Tests", () => {

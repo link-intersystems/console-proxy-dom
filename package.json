@@ -36,9 +36,6 @@
     "build": "rollup -c",
     "prepublishOnly": "npm run clean && npm run check-types && npm run lint -- --max-warnings 0 && npm test"
   },
-  "dependencies": {
-    "@babel/runtime": "^7.9.2"
-  },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.9.0",
