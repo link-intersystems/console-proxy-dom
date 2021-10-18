@@ -28,3 +28,11 @@ The consoleProxy module provides support for intercepting a console, usually the
     consoleProxy.setDirectFunctionHandler("log", (...args) => {
         // log diabled
     })
+
+
+## Console Proxy Handlers
+
+This module contains useful proxy handlers for the [ConsoleProxy](src/proxy/README.md). [Read more](src/handler/README.md)
+
+     const logEnablementHandler = createLogEnablementHandler();
+     logEnablementHandler.setLevelEnabled("log", false);
