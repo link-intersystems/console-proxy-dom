@@ -5,7 +5,7 @@
 ![GitHub issues](https://img.shields.io/github/issues-raw/link-intersystems/console-redirection)
 [![GitHub](https://img.shields.io/github/license/link-intersystems/console-redirection?label=license)](LICENSE.md)
 
-A library to intercept console function calls and redirect them whereever you like.
+A library to intercept console function calls and redirect them wherever you like.
 
 ## Console Template Module
 
