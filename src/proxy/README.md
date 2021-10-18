@@ -7,6 +7,22 @@
 
 The consoleProxy module provides support for intercepting a console, usually the default console.
 
+## createConsoleProxy
+
+Create a console proxy based on the default console.
+
+    const consoleProxy = createConsoleProxy();
+
+Create a console proxy based on an object that fulfills the [console API](https://developer.mozilla.org/en-US/docs/Web/API/Console).
+
+    const someOtherConsole = ... // another object with the console API
+    const consoleProxy = createConsoleProxy(someOtherConsole);
+
+Create a console proxy with a default handler. The default handler can also be set later with `ConsoleProxy.setDefaultHandler`.
+
+    const logEnablementHandler = createLogEnablementHandler();
+    const consoleProxy = createConsoleProxy(console, logEnablementHandler);
+
 ## ConsoleProxy.setDefaultHandler(handler?: Handler | Partial<Console>) => void;
 
 The default handler will handle all invocations if no specific handler is registered. To register a specific handler see `ConsoleProxy.setFunctionHandler` and `ConsoleProxy.setDirectFunctionHandler`
