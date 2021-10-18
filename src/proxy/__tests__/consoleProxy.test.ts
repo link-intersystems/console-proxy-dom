@@ -32,7 +32,16 @@ describe("ConsoleProxy Tests", () => {
     expect(consoleFnNames[0]).toEqual(fnName);
   });
 
-  test("setHandler unknown function", () => {
+  test("setDirectFunctionHandler unknown function", () => {
+    expect(() =>
+      consoleProxy.setDirectFunctionHandler(
+        "foobar" as ConsoleFunctionName,
+        () => {}
+      )
+    ).toThrowError();
+  });
+
+  test("setFunctionHandler unknown function", () => {
     expect(() =>
       consoleProxy.setFunctionHandler("foobar" as ConsoleFunctionName, () => {})
     ).toThrowError();
@@ -115,6 +124,38 @@ describe("ConsoleProxy Tests", () => {
 
     expect(customConsole.log).toHaveBeenCalledWith("enabled");
     expect(consoleMock.log).not.toHaveBeenCalledWith("enabled");
+  });
+
+  test("setDirectFunctionHandler", () => {
+    const logFnMock = jest.fn();
+    consoleProxy.setDirectFunctionHandler("log", logFnMock);
+
+    consoleProxy.log("test");
+    expect(logFnMock).toHaveBeenCalledWith("test")
+
+    consoleProxy.log();
+    expect(logFnMock).toHaveBeenCalledWith()
+  });
+
+  test("setFunctionHandler", () => {
+    const logFnHandlerMock = jest.fn();
+    consoleProxy.setFunctionHandler("log", logFnHandlerMock);
+
+    consoleProxy.log("test");
+    expect(logFnHandlerMock).toHaveBeenCalledWith({
+      target: consoleMock,
+      targetFn: consoleMock.log,
+      targetFnName: "log",
+      args: ["test"]
+    })
+
+    consoleProxy.log();
+    expect(logFnHandlerMock).toHaveBeenCalledWith({
+      target: consoleMock,
+      targetFn: consoleMock.log,
+      targetFnName: "log",
+      args: []
+    })
   });
 
   test("getTargetConsole", () => {

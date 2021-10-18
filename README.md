@@ -13,3 +13,18 @@ The console template module provides template methods that ensure that the conso
 
     logEnablementHandler.setLevelEnabled("info", false);
     consoleTemplate.execFn(codeThatLogs)
+
+## Console Proxy Module
+
+The consoleProxy module provides support for intercepting a console, usually the default console. [Read more](src/proxy/README.md)
+
+    let lastInfoLog: string;
+ 
+    const consoleProxy = createConsoleProxy();
+    consoleProxy.setDirectFunctionHandler("info", (...args) => {
+        lastInfoLog = args.join(" ");
+    })
+
+    consoleProxy.setDirectFunctionHandler("log", (...args) => {
+        // log diabled
+    })

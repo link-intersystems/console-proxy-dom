@@ -1,11 +1,6 @@
-import {
-  ConsoleFunctionName,
-  ConsoleProxy,
-  createConsoleProxy,
-} from "../../proxy/consoleProxy";
+import { ConsoleProxy, createConsoleProxy } from "../../proxy/consoleProxy";
 import { createConsoleTemplate, ConsoleTemplate } from "../consoleTemplate";
 import { createConsoleMock } from "../../proxy/__tests__/consoleProxy.test";
-import exp from "constants";
 
 describe("ConsoleProxyControl Tests", () => {
   let proxyTargetMock: Console;
@@ -65,7 +60,7 @@ describe("ConsoleProxyControl Tests", () => {
 
   test("redirected Template", () => {
     const logFnMock = jest.fn();
-    proxy.setFunctionHandler("log", logFnMock);
+    proxy.setDirectFunctionHandler("log", logFnMock);
 
     function testFn() {
       proxyTargetMock.log("test");
@@ -80,7 +75,7 @@ describe("ConsoleProxyControl Tests", () => {
 
   test("redirected template - proxy already enabled", () => {
     const logFnMock = jest.fn();
-    proxy.setFunctionHandler("log", logFnMock);
+    proxy.setDirectFunctionHandler("log", logFnMock);
 
     function testFn2() {
       proxyTargetMock.log("test2");
@@ -100,20 +95,42 @@ describe("ConsoleProxyControl Tests", () => {
     expect(logFnMock).toBeCalledWith("test2");
   });
 
-  test("bindProxy", () => {
+  test("wrapFn with direct handler", () => {
     const logFnMock = jest.fn();
-    proxy.setFunctionHandler("log", logFnMock);
+    proxy.setDirectFunctionHandler("log", logFnMock);
 
     function testFn() {
-      proxyTargetMock.log("bindProxy");
-      return "bindProxy logged";
+      proxyTargetMock.log("wrapped function logged");
+      return "wrapped function logged";
     }
     const wrappedFn = consoleTemplate.wrapFn(testFn);
 
     const result = wrappedFn();
 
-    expect(result).toBe("bindProxy logged");
-    expect(logFnMock).toBeCalledWith("bindProxy");
-    expect(proxyTargetMock.log).not.toBeCalledWith("bindProxy");
+    expect(result).toBe("wrapped function logged");
+    expect(logFnMock).toBeCalledWith("wrapped function logged");
+    expect(proxyTargetMock.log).not.toBeCalledWith("wrapped function logged");
+  });
+
+  test("wrapFn with handler", () => {
+    const logFnHandlerMock = jest.fn();
+    proxy.setFunctionHandler("log", logFnHandlerMock);
+
+    function testFn() {
+      proxyTargetMock.log("wrapped function logged");
+      return "wrapped function logged";
+    }
+    const wrappedFn = consoleTemplate.wrapFn(testFn);
+
+    const result = wrappedFn();
+
+    expect(result).toBe("wrapped function logged");
+    expect(logFnHandlerMock).toBeCalledWith({
+      target: proxyTargetMock,
+      targetFn: proxyTargetMock.log,
+      targetFnName: "log",
+      args: ["wrapped function logged"],
+    });
+    expect(proxyTargetMock.log).not.toBeCalledWith("wrapped function logged");
   });
 });

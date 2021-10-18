@@ -4,9 +4,9 @@ export type ConsoleFunctionName = keyof Console;
 
 export type HandlerInvocation = {
   target: Console;
-  targetFn: () => any;
+  targetFn: (...args: any[]) => any;
   targetFnName: ConsoleFunctionName;
-  args: [];
+  args: any[];
 };
 export type Handler = (invocation: HandlerInvocation) => any;
 
@@ -14,9 +14,13 @@ export type DefaultHandler = Handler | Partial<Console>;
 
 export type ConsoleProxy = Console & {
   setDefaultHandler: (handler?: Handler | Partial<Console>) => void;
+  setDirectFunctionHandler(
+    fnName: ConsoleFunctionName,
+    handler: (...args: any[]) => any
+  ): UnregisterHandler;
   setFunctionHandler(
     fnName: ConsoleFunctionName,
-    handler: () => any
+    handler: Handler
   ): UnregisterHandler;
   getTargetConsole: () => Console;
 };
@@ -91,12 +95,15 @@ export function createConsoleProxy(
     } else {
       defaultHandler = function (invocation: HandlerInvocation) {
         const handlerFn = handler[invocation.targetFnName] as <R>() => R;
-        return handlerFn.apply(handler, invocation.args);
+        return handlerFn.apply(handler, invocation.args as []);
       };
     }
   }
 
-  function setFunctionHandler(fnName: string, handler: () => any) {
+  function setDirectFunctionHandler(
+    fnName: ConsoleFunctionName,
+    handler: (...args: any[]) => any
+  ) {
     if (!(fnName in targetConsole)) {
       const msg = `Console doesn't have a function named ${fnName}`;
       throw new Error(msg);
@@ -106,25 +113,38 @@ export function createConsoleProxy(
       return handler.apply(proxy, invocation.args);
     };
 
-    fnHandlers.set(fnName, handlerFunction);
+    return setFunctionHandler(fnName, handlerFunction);
+  }
+
+  function setFunctionHandler(fnName: string, handler: Handler) {
+    if (!(fnName in targetConsole)) {
+      const msg = `Console doesn't have a function named ${fnName}`;
+      throw new Error(msg);
+    }
+
+    fnHandlers.set(fnName, handler);
     return () => {
       fnHandlers.delete(fnName);
     };
   }
 
-  const proxy = consoleFnNames.reduce((proxy, fn) => {
-    if (origTargetConsoleFunctions[fn as ConsoleFunctionName]) {
-      const proxyFn = createProxyFn(fn as ConsoleFunctionName);
-      (proxy as any)[fn] = proxyFn.bind(proxy);
-    }
-    return proxy;
-  }, {} as ConsoleProxy);
+  const proxy = consoleFnNames.reduce(
+    (proxy, fn) => {
+      if (origTargetConsoleFunctions[fn as ConsoleFunctionName]) {
+        const proxyFn = createProxyFn(fn as ConsoleFunctionName);
+        (proxy as any)[fn] = proxyFn.bind(proxy);
+      }
+      return proxy;
+    },
+    {
+      setDirectFunctionHandler,
+      setFunctionHandler,
+      setDefaultHandler,
+      getTargetConsole,
+    } as ConsoleProxy
+  );
 
   setDefaultHandler(defaultHandlerArg);
-
-  proxy.setFunctionHandler = setFunctionHandler;
-  proxy.setDefaultHandler = setDefaultHandler;
-  proxy.getTargetConsole = getTargetConsole;
 
   return proxy;
 }
