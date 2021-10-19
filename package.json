@@ -1,20 +1,21 @@
 {
-  "name": "@link-intersystems/console-redirection",
+  "name": "@link-intersystems/console-redirection-dom",
   "version": "1.0.0",
-  "description": "Easy to use and flexible console redirection library.",
+  "description": "DOM extension for the @link-intersystems/console-redirection lib.",
   "license": "MIT",
   "keywords": [
     "console",
-    "redirection"
+    "redirection",
+    "dom"
   ],
   "authors": [
     "René Link <rene.link@link-intersystems.com> (https://stackoverflow.com/users/974186/ren%c3%a9-link?tab=profile)"
   ],
-  "repository": "github:link-intersystems/console-redirection",
-  "bugs": "https://github.com/link-intersystems/console-redirection/issues",
-  "main": "lib/console-redirection.js",
-  "unpkg": "dist/console-redirection.js",
-  "module": "es/console-redirection.js",
+  "repository": "github:link-intersystems/console-redirection-dom",
+  "bugs": "https://github.com/link-intersystems/console-redirection-dom/issues",
+  "main": "lib/console-redirection-dom.js",
+  "unpkg": "dist/console-redirection-dom.js",
+  "module": "es/console-redirection-dom.js",
   "types": "types/index.d.ts",
   "files": [
     "dist",
@@ -35,6 +36,9 @@
     "build": "rollup -c",
     "prepublishOnly": "npm run clean && npm run check-types && npm run lint -- --max-warnings 0 && npm test && npm run build"
   },
+  "dependencies": {
+    "@link-intersystems/console-redirection": "../console-redirection"
+  },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.9.0",
@@ -49,6 +53,8 @@
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-node-resolve": "^13.0.4",
     "@rollup/plugin-replace": "^3.0.0",
+    "@testing-library/dom": "^8.10.0",
+    "@testing-library/jest-dom": "^5.14.1",
     "@types/jest": "^27.0.0",
     "@types/node": "^16.4.10",
     "@typescript-eslint/eslint-plugin": "^4.23.0",

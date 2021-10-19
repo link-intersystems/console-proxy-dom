@@ -1,9 +1,9 @@
-# Console Template
+# DOM Handlers
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/link-intersystems/console-redirection/Node.js%20CI)
-![Coveralls](https://img.shields.io/coveralls/github/link-intersystems/console-redirection)
-![GitHub issues](https://img.shields.io/github/issues-raw/link-intersystems/console-redirection)
-[![GitHub](https://img.shields.io/github/license/link-intersystems/console-redirection?label=license)](LICENSE.md)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/link-intersystems/console-redirection-dom/Node.js%20CI)
+![Coveralls](https://img.shields.io/coveralls/github/link-intersystems/console-redirection-dom)
+![GitHub issues](https://img.shields.io/github/issues-raw/link-intersystems/console-redirection-dom)
+[![GitHub](https://img.shields.io/github/license/link-intersystems/console-redirection-dom?label=license)](LICENSE.md)
 
 The console template module provides template methods that ensure that the console is properly proxies when the target function executes.
 
