@@ -7,7 +7,6 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "lib": ["dom", "es2017"],
-    "jsx": "react",
     "declaration": true,
     "declarationDir": "./types",
     "sourceMap": true,

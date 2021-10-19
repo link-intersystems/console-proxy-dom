@@ -1,10 +1,13 @@
+import {
+  ConsoleInvocation,
+  consoleLogFnNames,
+} from "@link-intersystems/console-redirection";
+
 export type LogLevel = "log" | "info" | "warn" | "debug" | "error";
 
-export type DomConsoleLogHandler = Pick<
-  Console,
-  "info" | "warn" | "log" | "debug" | "error"
-> & {
-  setBaseDomElement(baseElement?: HTMLElement): void;
+export type DomConsoleLogInterceptor = {
+  invoke(invocation: ConsoleInvocation): any;
+  setBaseDomElement(baseElement: Element): void;
   setLogTargetSelector(cssSelector: string): void;
   setHtmlElementAppender(appender: HtmlElementAppender): void;
   setLogFormat(format: LogFormat): void;
@@ -38,52 +41,26 @@ const simpleLogFormat: LogFormat = {
   },
 };
 
-const propertyAccessorFactory = (propName: string) => ({
-  get: (e: any) => e[propName],
-  set: (e: any, v: any) => (e[propName] = v),
-});
-
-const valueAccessor = propertyAccessorFactory("value");
-const innerTextAccessor = propertyAccessorFactory("innerText");
-
-const valueAccessorMap = new Map();
-valueAccessorMap.set("textarea", valueAccessor);
-valueAccessorMap.set("input", valueAccessor);
-
-const resolveValueAccessor = (e: any) => {
-  const elementName = e.nodeName.toLowerCase();
-  const valueAccessor = valueAccessorMap.get(elementName) || innerTextAccessor;
-  return valueAccessor;
-};
-
-const resolvingTextAccessor = {
-  get: (e: any) => {
-    return resolveValueAccessor(e).get(e);
-  },
-  set: (e: any, v: any) => {
-    return resolveValueAccessor(e).set(e, v);
-  },
-};
-
 const defaultLogTargetSelector = "#console";
 const defaultLogEntrySeparator = "\n";
 
 export function createDOMConsoleLogHandler(
   targetConsole: Console = console
-): DomConsoleLogHandler {
+): DomConsoleLogInterceptor {
   const targetConsoleFunctions = { ...targetConsole };
 
   let logEntrySeparator = defaultLogEntrySeparator;
 
-  let baseDomElement: HTMLElement;
+  let baseDomElement: Element = document.body;
   let logTargetSelector: string;
   let domElementAppender: HtmlElementAppender;
   let logFormat: LogFormat;
   let actLogEntrySeparator = "";
 
-  function setBaseDomElement(baseElement: HTMLElement = document.body) {
+  function setBaseDomElement(baseElement: Element) {
     baseDomElement = baseElement;
   }
+
   function setLogTargetSelector(
     cssSelector: string = defaultLogTargetSelector
   ) {
@@ -117,19 +94,17 @@ export function createDOMConsoleLogHandler(
     actLogEntrySeparator = logEntrySeparator;
   }
 
-  setBaseDomElement();
   setLogTargetSelector();
   setHtmlElementAppender();
   setLogFormat();
 
   return {
-    log: function () {
-      log.apply(this, ["log", Array.from(arguments)]);
+    invoke(invocation) {
+      if (consoleLogFnNames.includes(invocation.fnName)) {
+        return log(invocation.fnName as LogLevel, invocation.args);
+      }
+      return invocation.proceed();
     },
-    info: (...args: any[]) => log("info", args),
-    warn: (...args: any[]) => log("warn", args),
-    error: (...args: any[]) => log("error", args),
-    debug: (...args: any[]) => log("debug", args),
     setBaseDomElement,
     setLogTargetSelector,
     setLogFormat,
