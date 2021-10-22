@@ -1,5 +1,6 @@
 import { screen } from "@testing-library/dom";
 import redirect_textarea from "./redirect_textarea.html";
+import redirect_div from "./redirect_div.html";
 import {
   createDOMConsoleLogHandler,
   DomConsoleLogInterceptor,
@@ -8,7 +9,7 @@ import { createConsoleMock } from "@link-intersystems/console-redirection/src/__
 import { createConsoleProxy } from "@link-intersystems/console-redirection/src/proxy/consoleProxy";
 import { ConsoleProxy } from "@link-intersystems/console-redirection";
 
-describe("DomHandlers Tests", () => {
+describe("interceptors Tests", () => {
   let proxy: ConsoleProxy;
   let domConsoleLogInterceptor: DomConsoleLogInterceptor;
 
@@ -18,23 +19,44 @@ describe("DomHandlers Tests", () => {
     proxy.setInterceptor(domConsoleLogInterceptor);
   });
 
-  function testAllLevels() {
+  function getInputValue(element: Element) {
+    return (element as any)?.value;
+  }
+
+  function getInnerHtml(element: Element) {
+    return (element as any)?.innerHTML;
+  }
+
+  function logAllLevels() {
+    const consoleOutput = screen.queryByTestId("consoleOutput") as HTMLElement;
+    expect(consoleOutput).toBeInTheDocument();
+
     proxy.log("Log");
     proxy.info("Info");
     proxy.warn("Warn");
     proxy.debug("Debug");
     proxy.error("Error");
-
-    const consoleOutput = screen.queryByTestId("consoleOutput");
-    expect(consoleOutput).toBeInTheDocument();
-    expect((consoleOutput as any)?.value).toEqual(
-      "LOG: Log\nINFO: Info\nWARN: Warn\nDEBUG: Debug\nERROR: Error"
-    );
   }
+
+  function expectOutputToBe(
+    expected: string,
+    getConsoleElementContent: (elemen: Element) => string = getInputValue
+  ) {
+    const consoleOutput = screen.queryByTestId("consoleOutput") as HTMLElement;
+    const consoleElementContent = getConsoleElementContent(consoleOutput);
+    expect(consoleElementContent).toEqual(expected);
+  }
+
   test("Redirect all log levels to textarea", async () => {
     document.body.innerHTML = redirect_textarea;
 
-    testAllLevels();
+    logAllLevels();
+
+    expectOutputToBe(`LOG: Log
+INFO: Info
+WARN: Warn
+DEBUG: Debug
+ERROR: Error`);
   });
 
   test("Redirect useing base element", async () => {
@@ -45,7 +67,12 @@ describe("DomHandlers Tests", () => {
 
     container && domConsoleLogInterceptor.setBaseDomElement(container);
 
-    testAllLevels();
+    logAllLevels();
+    expectOutputToBe(`LOG: Log
+INFO: Info
+WARN: Warn
+DEBUG: Debug
+ERROR: Error`);
   });
 
   test("Redirect useing custom selector", async () => {
@@ -53,7 +80,12 @@ describe("DomHandlers Tests", () => {
 
     domConsoleLogInterceptor.setLogTargetSelector("textarea");
 
-    testAllLevels();
+    logAllLevels();
+    expectOutputToBe(`LOG: Log
+INFO: Info
+WARN: Warn
+DEBUG: Debug
+ERROR: Error`);
   });
 
   test("default console", async () => {
@@ -64,7 +96,12 @@ describe("DomHandlers Tests", () => {
 
     domConsoleLogInterceptor.setLogTargetSelector("textarea");
 
-    testAllLevels();
+    logAllLevels();
+    expectOutputToBe(`LOG: Log
+INFO: Info
+WARN: Warn
+DEBUG: Debug
+ERROR: Error`);
   });
 
   test("log error if target html element does not exist", async () => {
