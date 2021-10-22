@@ -1,21 +1,22 @@
 {
-  "name": "@link-intersystems/console-redirection-dom",
+  "name": "@link-intersystems/console-proxy-dom",
   "version": "1.0.0",
-  "description": "DOM extension for the @link-intersystems/console-redirection lib.",
+  "description": "DOM extension for the @link-intersystems/console-proxy lib.",
   "license": "MIT",
   "keywords": [
     "console",
-    "redirection",
+    "proxy",
+    "redirect",
     "dom"
   ],
   "authors": [
     "René Link <rene.link@link-intersystems.com> (https://stackoverflow.com/users/974186/ren%c3%a9-link?tab=profile)"
   ],
-  "repository": "github:link-intersystems/console-redirection-dom",
-  "bugs": "https://github.com/link-intersystems/console-redirection-dom/issues",
-  "main": "lib/console-redirection-dom.js",
-  "unpkg": "dist/console-redirection-dom.js",
-  "module": "es/console-redirection-dom.js",
+  "repository": "github:link-intersystems/console-proxy-dom",
+  "bugs": "https://github.com/link-intersystems/console-proxy-dom/issues",
+  "main": "lib/console-proxy-dom.js",
+  "unpkg": "dist/console-proxy-dom.js",
+  "module": "es/console-proxy-dom.js",
   "types": "types/index.d.ts",
   "files": [
     "dist",
@@ -37,7 +38,7 @@
     "prepublishOnly": "npm run clean && npm run check-types && npm run lint -- --max-warnings 0 && npm test && npm run build"
   },
   "dependencies": {
-    "@link-intersystems/console-redirection": "^1.0.0"
+    "@link-intersystems/console-proxy": "^1.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",

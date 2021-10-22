@@ -2,7 +2,7 @@ import {
   ConsoleInvocation,
   consoleLogFnNames,
   LogLevel,
-} from "@link-intersystems/console-redirection";
+} from "@link-intersystems/console-proxy";
 
 import { HtmlElementLogConfig, inputHtmlLogConfig } from "./logConfigs";
 

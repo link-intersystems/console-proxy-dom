@@ -6,8 +6,8 @@ import {
   createDOMConsoleLogHandler,
   DomConsoleLogInterceptor,
 } from "../interceptors";
-import { createConsoleProxy } from "@link-intersystems/console-redirection";
-import { ConsoleProxy } from "@link-intersystems/console-redirection";
+import { createConsoleProxy } from "@link-intersystems/console-proxy";
+import { ConsoleProxy } from "@link-intersystems/console-proxy";
 import {
   defaultHtmlLogConfig,
   inputHtmlLogConfig,
@@ -27,11 +27,11 @@ describe("logConfigs Tests", () => {
   });
 
   function getInputValue(element: Element) {
-    return (element as any)?.value;
+    if (element) return (element as any).value;
   }
 
   function getInnerHtml(element: Element) {
-    return (element as any)?.innerHTML;
+    if (element) return (element as any).innerHTML;
   }
 
   function logAllLevels() {
@@ -143,7 +143,7 @@ ERROR: Error`);
 
     logAllLevels();
 
-    proxy.log("<!-- a comment -->")
+    proxy.log("<!-- a comment -->");
 
     expectOutputToBe(
       `<!-- Missing template "#unknownTemplate": log: Log -->

@@ -4,7 +4,7 @@ import {
   createDOMConsoleLogHandler,
   DomConsoleLogInterceptor,
 } from "../interceptors";
-import { consoleFnNames, ConsoleProxy, createConsoleProxy } from "@link-intersystems/console-redirection";
+import { consoleFnNames, ConsoleProxy, createConsoleProxy } from "@link-intersystems/console-proxy";
 
 function createConsoleMock() {
   return consoleFnNames.reduce((proxy, fn) => {
@@ -24,11 +24,7 @@ describe("interceptors Tests", () => {
   });
 
   function getInputValue(element: Element) {
-    return (element as any)?.value;
-  }
-
-  function getInnerHtml(element: Element) {
-    return (element as any)?.innerHTML;
+    if(element) return (element as any).value;
   }
 
   function logAllLevels() {

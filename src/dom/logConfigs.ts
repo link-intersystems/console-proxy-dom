@@ -1,4 +1,4 @@
-import { LogLevel } from "@link-intersystems/console-redirection";
+import { LogLevel } from "@link-intersystems/console-proxy";
 
 export type HtmlElementAppender = {
   append: (element: Element, text: string) => void;
@@ -78,9 +78,9 @@ export function interpolateTemplate(
 
 export type LogMessageFactory = (logEntry: LogEntry) => string;
 
-function escapeHtml(html: string){
+function escapeHtml(html: string) {
   var text = document.createTextNode(html);
-  var p = document.createElement('p');
+  var p = document.createElement("p");
   p.appendChild(text);
   return p.innerHTML;
 }
@@ -104,9 +104,11 @@ export const templateLogFormatFactory: TemplateLogFormatFactory = (
 ) => {
   return {
     format: (logEntry: LogEntry) => {
+      const templateElement = document.querySelector(templateSelector);
       const template =
-        document.querySelector(templateSelector)?.innerHTML ||
-        templateNotFoundTemplate;
+        templateElement != null
+          ? templateElement.innerHTML
+          : templateNotFoundTemplate;
       const message = logMessageFactory(logEntry);
       const level = logEntry.level;
       const levelUpperCase = logEntry.level.toUpperCase();
