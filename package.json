@@ -37,7 +37,7 @@
     "prepublishOnly": "npm run clean && npm run check-types && npm run lint -- --max-warnings 0 && npm test && npm run build"
   },
   "dependencies": {
-    "@link-intersystems/console-redirection": "../console-redirection"
+    "@link-intersystems/console-redirection": "^1.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",

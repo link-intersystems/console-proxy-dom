@@ -6,7 +6,7 @@ import {
   createDOMConsoleLogHandler,
   DomConsoleLogInterceptor,
 } from "../interceptors";
-import { createConsoleProxy } from "@link-intersystems/console-redirection/src/proxy/consoleProxy";
+import { createConsoleProxy } from "@link-intersystems/console-redirection";
 import { ConsoleProxy } from "@link-intersystems/console-redirection";
 import {
   defaultHtmlLogConfig,

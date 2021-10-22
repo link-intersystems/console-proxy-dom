@@ -1,13 +1,17 @@
 import { screen } from "@testing-library/dom";
 import redirect_textarea from "./redirect_textarea.html";
-import redirect_div from "./redirect_div.html";
 import {
   createDOMConsoleLogHandler,
   DomConsoleLogInterceptor,
 } from "../interceptors";
-import { createConsoleMock } from "@link-intersystems/console-redirection/src/__tests__";
-import { createConsoleProxy } from "@link-intersystems/console-redirection/src/proxy/consoleProxy";
-import { ConsoleProxy } from "@link-intersystems/console-redirection";
+import { consoleFnNames, ConsoleProxy, createConsoleProxy } from "@link-intersystems/console-redirection";
+
+function createConsoleMock() {
+  return consoleFnNames.reduce((proxy, fn) => {
+    (proxy as any)[fn] = jest.fn();
+    return proxy;
+  }, {} as Console);
+}
 
 describe("interceptors Tests", () => {
   let proxy: ConsoleProxy;
