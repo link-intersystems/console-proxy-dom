@@ -1,6 +1,5 @@
 import { screen } from "@testing-library/dom";
 import redirect_textarea from "./redirect_textarea.html";
-import redirect_div from "./redirect_div.html";
 import {
   createDOMConsoleLogInterceptor,
   DomConsoleLogInterceptor,
@@ -10,7 +9,6 @@ import {
   ConsoleProxy,
   createConsoleProxy,
 } from "@link-intersystems/console-proxy";
-import { defaultLogConfig, valueLogConfig } from "../logConfigs";
 
 function createConsoleMock() {
   return consoleFnNames.reduce((proxy, fn) => {
