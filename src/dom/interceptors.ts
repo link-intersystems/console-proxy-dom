@@ -33,12 +33,14 @@ export function createDOMConsoleLogInterceptor(
     cssSelector: string = defaultLogTargetSelector
   ) {
     logTargetSelector = cssSelector;
+    actLogEntrySeparator = "";
   }
 
   function setLogConfig(
     htmlElementLogConfig: HtmlElementLogConfig = valueLogConfig
   ) {
     logConfig = htmlElementLogConfig;
+    if(actLogEntrySeparator !== "") actLogEntrySeparator = logConfig.logEntrySeparator;
   }
 
   function log(level: LogLevel, args: any[]) {

@@ -1,10 +1,16 @@
 import { screen } from "@testing-library/dom";
 import redirect_textarea from "./redirect_textarea.html";
+import redirect_div from "./redirect_div.html";
 import {
   createDOMConsoleLogInterceptor,
   DomConsoleLogInterceptor,
 } from "../interceptors";
-import { consoleFnNames, ConsoleProxy, createConsoleProxy } from "@link-intersystems/console-proxy";
+import {
+  consoleFnNames,
+  ConsoleProxy,
+  createConsoleProxy,
+} from "@link-intersystems/console-proxy";
+import { defaultLogConfig, valueLogConfig } from "../logConfigs";
 
 function createConsoleMock() {
   return consoleFnNames.reduce((proxy, fn) => {
@@ -24,7 +30,7 @@ describe("interceptors Tests", () => {
   });
 
   function getInputValue(element: Element) {
-    if(element) return (element as any).value;
+    if (element) return (element as any).value;
   }
 
   function logAllLevels() {

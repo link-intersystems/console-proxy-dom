@@ -155,4 +155,32 @@ ERROR: Error`);
       getInnerHtml
     );
   });
+
+  
+  test("change the logConfig", async () => {
+    domConsoleLogInterceptor = createDOMConsoleLogInterceptor();
+    proxy.setInterceptor(domConsoleLogInterceptor);
+    domConsoleLogInterceptor.setLogConfig(defaultLogConfig);
+
+    document.body.innerHTML = redirect_div;
+
+    logAllLevels();
+    expectOutputToBe(
+      `LOG: Log<br>INFO: Info<br>WARN: Warn<br>DEBUG: Debug<br>ERROR: Error`,
+      getInnerHtml
+    );
+
+    domConsoleLogInterceptor.setLogConfig(valueLogConfig);
+    domConsoleLogInterceptor.setLogTargetSelector("textarea");
+    document.body.innerHTML = redirect_textarea;
+
+    logAllLevels();
+    expectOutputToBe(
+      `LOG: Log
+INFO: Info
+WARN: Warn
+DEBUG: Debug
+ERROR: Error`
+    );
+  });
 });
