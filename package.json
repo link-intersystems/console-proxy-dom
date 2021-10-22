@@ -1,6 +1,6 @@
 {
   "name": "@link-intersystems/console-proxy-dom",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "DOM extension for the @link-intersystems/console-proxy lib.",
   "license": "MIT",
   "keywords": [

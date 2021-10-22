@@ -1,3 +1,2 @@
-export * from "./proxy/consoleProxy";
-export * from "./template/consoleTemplate";
-export * from "./handler/consoleHandlers";
+export * from "./dom/interceptors";
+export * from "./dom/logConfigs"

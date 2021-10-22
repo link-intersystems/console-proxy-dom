@@ -5,7 +5,7 @@
 ![GitHub issues](https://img.shields.io/github/issues-raw/link-intersystems/console-redirection)
 [![GitHub](https://img.shields.io/github/license/link-intersystems/console-redirection?label=license)](LICENSE.md)
 
-An extension library for "@link-intersystems/console-proxy" that contains utilities to redirect console logs to dom elements, e.g. a textarea.
+An extension library for [@link-intersystems/console-proxy](https://github.com/link-intersystems/console-proxy) that contains utilities to redirect console logs to dom elements, e.g. a textarea.
 
 ## Install
 

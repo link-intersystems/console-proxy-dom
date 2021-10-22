@@ -96,6 +96,7 @@ export type TemplateLogFormatFactory = (
 ) => LogFormat;
 
 const templateNotFoundTemplate =
+  // eslint-disable-next-line no-template-curly-in-string
   '<!-- Missing template "${templateSelector}": ${level}: ${message} -->';
 
 export const templateLogFormatFactory: TemplateLogFormatFactory = (

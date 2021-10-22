@@ -3,14 +3,14 @@ import redirect_textarea from "./redirect_textarea.html";
 import redirect_div from "./redirect_div.html";
 import redirect_template from "./redirect_template.html";
 import {
-  createDOMConsoleLogHandler,
+  createDOMConsoleLogInterceptor,
   DomConsoleLogInterceptor,
 } from "../interceptors";
 import { createConsoleProxy } from "@link-intersystems/console-proxy";
 import { ConsoleProxy } from "@link-intersystems/console-proxy";
 import {
-  defaultHtmlLogConfig,
-  inputHtmlLogConfig,
+  defaultLogConfig,
+  valueLogConfig,
   listHtmlLogConfig,
   templateLogConfig,
   templateLogFormatFactory,
@@ -22,7 +22,7 @@ describe("logConfigs Tests", () => {
 
   beforeEach(() => {
     proxy = createConsoleProxy();
-    domConsoleLogInterceptor = createDOMConsoleLogHandler();
+    domConsoleLogInterceptor = createDOMConsoleLogInterceptor();
     proxy.setInterceptor(domConsoleLogInterceptor);
   });
 
@@ -57,7 +57,7 @@ describe("logConfigs Tests", () => {
   test("defaultHtmlLogConfig", () => {
     document.body.innerHTML = redirect_div;
 
-    domConsoleLogInterceptor.setLogConfig(defaultHtmlLogConfig);
+    domConsoleLogInterceptor.setLogConfig(defaultLogConfig);
 
     logAllLevels();
     expectOutputToBe(
@@ -69,7 +69,7 @@ describe("logConfigs Tests", () => {
   test("inputHtmlLogConfig", () => {
     document.body.innerHTML = redirect_textarea;
 
-    domConsoleLogInterceptor.setLogConfig(inputHtmlLogConfig);
+    domConsoleLogInterceptor.setLogConfig(valueLogConfig);
 
     logAllLevels();
 
