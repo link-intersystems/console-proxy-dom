@@ -1,9 +1,9 @@
 # Console Proxy Dom Library
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/link-intersystems/console-redirection/Node.js%20CI)
-![Coveralls](https://img.shields.io/coveralls/github/link-intersystems/console-redirection)
-![GitHub issues](https://img.shields.io/github/issues-raw/link-intersystems/console-redirection)
-[![GitHub](https://img.shields.io/github/license/link-intersystems/console-redirection?label=license)](LICENSE.md)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/link-intersystems/console-proxy-dom/Node.js%20CI)
+![Coveralls](https://img.shields.io/coveralls/github/link-intersystems/console-proxy-dom)
+![GitHub issues](https://img.shields.io/github/issues-raw/link-intersystems/console-proxy-dom)
+[![GitHub](https://img.shields.io/github/license/link-intersystems/console-proxy-dom?label=license)](LICENSE.md)
 
 An extension library for [@link-intersystems/console-proxy](https://github.com/link-intersystems/console-proxy) that contains utilities to redirect console logs to dom elements, e.g. a textarea.
 
