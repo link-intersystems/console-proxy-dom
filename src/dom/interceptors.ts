@@ -4,7 +4,7 @@ import {
   LogLevel,
 } from "@link-intersystems/console-proxy";
 
-import { HtmlElementLogConfig, inputHtmlLogConfig } from "./logConfigs";
+import { HtmlElementLogConfig, valueLogConfig } from "./logConfigs";
 
 export type DomConsoleLogInterceptor = {
   invoke(invocation: ConsoleInvocation): any;
@@ -15,7 +15,7 @@ export type DomConsoleLogInterceptor = {
 
 export const defaultLogTargetSelector = "#console";
 
-export function createDOMConsoleLogHandler(
+export function createDOMConsoleLogInterceptor(
   targetConsole: Console = console
 ): DomConsoleLogInterceptor {
   const targetConsoleFunctions = { ...targetConsole };
@@ -36,7 +36,7 @@ export function createDOMConsoleLogHandler(
   }
 
   function setLogConfig(
-    htmlElementLogConfig: HtmlElementLogConfig = inputHtmlLogConfig
+    htmlElementLogConfig: HtmlElementLogConfig = valueLogConfig
   ) {
     logConfig = htmlElementLogConfig;
   }

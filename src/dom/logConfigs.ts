@@ -21,7 +21,7 @@ export type HtmlElementLogConfig = {
 
 export const defaultLogEntrySeparator = "\n";
 
-export const inputElementAppender: HtmlElementAppender = {
+export const valueAppender: HtmlElementAppender = {
   append: function (element, text) {
     const actualValue = (element as HTMLInputElement).value;
     const newValue = actualValue + text;
@@ -29,7 +29,7 @@ export const inputElementAppender: HtmlElementAppender = {
   },
 };
 
-export const innerHtmlElementAppender: HtmlElementAppender = {
+export const innerHtmlAppender: HtmlElementAppender = {
   append: function (element, text) {
     const actualValue = (element as HTMLElement).innerHTML || "";
     const newValue = actualValue + text;
@@ -44,14 +44,14 @@ export const simpleLogFormat: LogFormat = {
   },
 };
 
-export const defaultHtmlLogConfig: HtmlElementLogConfig = Object.freeze({
-  appender: innerHtmlElementAppender,
+export const defaultLogConfig: HtmlElementLogConfig = Object.freeze({
+  appender: innerHtmlAppender,
   logFormat: simpleLogFormat,
   logEntrySeparator: "<br/>",
 });
 
-export const inputHtmlLogConfig: HtmlElementLogConfig = Object.freeze({
-  appender: inputElementAppender,
+export const valueLogConfig: HtmlElementLogConfig = Object.freeze({
+  appender: valueAppender,
   logFormat: simpleLogFormat,
   logEntrySeparator: "\n",
 });
@@ -64,7 +64,7 @@ const liLogFormat: LogFormat = Object.freeze({
 });
 
 export const listHtmlLogConfig: HtmlElementLogConfig = Object.freeze({
-  appender: innerHtmlElementAppender,
+  appender: innerHtmlAppender,
   logFormat: liLogFormat,
   logEntrySeparator: "\n",
 });
@@ -126,7 +126,7 @@ export const templateLogFormatFactory: TemplateLogFormatFactory = (
 export const defaultTemplateLogFormat = templateLogFormatFactory();
 
 export const templateLogConfig: HtmlElementLogConfig = Object.freeze({
-  appender: innerHtmlElementAppender,
+  appender: innerHtmlAppender,
   logFormat: defaultTemplateLogFormat,
   logEntrySeparator: "\n",
 });

@@ -1,38 +1,54 @@
-# Console Redirection
+# Console Proxy Dom Library
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/link-intersystems/console-redirection/Node.js%20CI)
 ![Coveralls](https://img.shields.io/coveralls/github/link-intersystems/console-redirection)
 ![GitHub issues](https://img.shields.io/github/issues-raw/link-intersystems/console-redirection)
 [![GitHub](https://img.shields.io/github/license/link-intersystems/console-redirection?label=license)](LICENSE.md)
 
-A library to intercept console function calls and redirect them wherever you like.
+An extension library for "@link-intersystems/console-proxy" that contains utilities to redirect console logs to dom elements, e.g. a textarea.
 
-## Console Template Module
+## Install
 
-The console template module provides template methods that ensure that the console is properly proxies when the target function executes. [Read more](src/template/README.md)
+     npm i "@link-intersystems/console-proxy-dom"
 
-    logEnablementHandler.setLevelEnabled("info", false);
-    consoleTemplate.execFn(codeThatLogs)
+## Use
 
-## Console Proxy Module
+    import {
+        createConsoleProxy,
+        createConsoleTemplate,
+    } from "@link-intersystems/console-proxy";
+    import {
+        valueLogConfig,
+        defaultLogConfig
+    } from "@link-intersystems/console-proxy-dom";
 
-The consoleProxy module provides support for intercepting a console, usually the default console. [Read more](src/proxy/README.md)
-
-    let lastInfoLog: string;
- 
     const consoleProxy = createConsoleProxy();
-    consoleProxy.setDirectFunctionHandler("info", (...args) => {
-        lastInfoLog = args.join(" ");
-    })
 
-    consoleProxy.setDirectFunctionHandler("log", (...args) => {
-        // log diabled
-    })
+    const domConsoleLogInterceptor = createDOMConsoleLogInterceptor();
+    domConsoleLogInterceptor.setLogTargetSelector("#console"); // the default
 
+    // The defaultLogConfig redirects logs by appending them to the target's innerHtml.
+    domConsoleLogInterceptor.setLogConfig(defaultLogConfig); // the default
+    
+    // The valueLogConfig redirects logs by appending them to the target's value property.
+    // E.g. can be used for textareas.
+    // domConsoleLogInterceptor.setLogConfig(valueLogConfig);
 
-## Console Proxy Handlers
+    consoleProxy.setInterceptor(domConsoleLogInterceptor);
 
-This module contains useful proxy handlers for the [ConsoleProxy](src/proxy/README.md). [Read more](src/handler/README.md)
+    // will be redirected to the dom element selected by the target css selector.
+    consoleProxy.info("INFO", "Hello", "World");
+    consoleProxy.debug("DEBUG", "Hellow", "World");     
 
-     const logEnablementHandler = createLogEnablementHandler();
-     logEnablementHandler.setLevelEnabled("log", false);
+E.g. a div target
+
+    <div class="container">
+        <div class="mb-3">
+            <label for="console" class="form-label">Console div</label>
+            <div data-testid="consoleOutput" class="form-control" id="console" style="height:8em; overflow: scroll;"></div>
+        </div>
+    </div>
+
+## Live Demo at codepen.io
+
+See [@link-intersystems/console-proxy-dom](https://codepen.io/rene-link/pen/gOxLvgO)

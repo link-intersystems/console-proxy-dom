@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/dom";
 import redirect_textarea from "./redirect_textarea.html";
 import {
-  createDOMConsoleLogHandler,
+  createDOMConsoleLogInterceptor,
   DomConsoleLogInterceptor,
 } from "../interceptors";
 import { consoleFnNames, ConsoleProxy, createConsoleProxy } from "@link-intersystems/console-proxy";
@@ -19,7 +19,7 @@ describe("interceptors Tests", () => {
 
   beforeEach(() => {
     proxy = createConsoleProxy();
-    domConsoleLogInterceptor = createDOMConsoleLogHandler();
+    domConsoleLogInterceptor = createDOMConsoleLogInterceptor();
     proxy.setInterceptor(domConsoleLogInterceptor);
   });
 
@@ -89,7 +89,7 @@ ERROR: Error`);
   });
 
   test("default console", async () => {
-    domConsoleLogInterceptor = createDOMConsoleLogHandler();
+    domConsoleLogInterceptor = createDOMConsoleLogInterceptor();
     proxy.setInterceptor(domConsoleLogInterceptor);
 
     document.body.innerHTML = redirect_textarea;
@@ -107,7 +107,7 @@ ERROR: Error`);
   test("log error if target html element does not exist", async () => {
     const consoleMock = createConsoleMock();
     proxy = createConsoleProxy(consoleMock);
-    domConsoleLogInterceptor = createDOMConsoleLogHandler(consoleMock);
+    domConsoleLogInterceptor = createDOMConsoleLogInterceptor(consoleMock);
     proxy.setInterceptor(domConsoleLogInterceptor);
 
     domConsoleLogInterceptor.setLogTargetSelector("foo");
@@ -121,7 +121,7 @@ ERROR: Error`);
   test("Non log function is dispatched to target console", async () => {
     const consoleMock = createConsoleMock();
     proxy = createConsoleProxy(consoleMock);
-    domConsoleLogInterceptor = createDOMConsoleLogHandler(consoleMock);
+    domConsoleLogInterceptor = createDOMConsoleLogInterceptor(consoleMock);
     proxy.setInterceptor(domConsoleLogInterceptor);
 
     proxy.count("label");
