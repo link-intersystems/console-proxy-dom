@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "strict": true,
-    "target": "ESNext",
+    "target": "ES2019",
     "module": "ESNext",
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "lib": ["dom", "es2017"],
+    "lib": ["dom", "ES2019"],
     "declaration": true,
     "declarationDir": "./types",
     "sourceMap": true,
@@ -15,6 +15,5 @@
     "noUnusedParameters": false,
     "baseUrl": "./src"
   },
-  "include": ["src"],
-  "exclude": ["src/**/__tests__/*"]
+  "include": ["src"]
 }
