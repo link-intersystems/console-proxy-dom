@@ -40,18 +40,28 @@ export function createDOMConsoleLogInterceptor(
     htmlElementLogConfig: HtmlElementLogConfig = valueLogConfig
   ) {
     logConfig = htmlElementLogConfig;
-    if(actLogEntrySeparator !== "") actLogEntrySeparator = logConfig.logEntrySeparator;
+    if (actLogEntrySeparator !== "")
+      actLogEntrySeparator = logConfig.logEntrySeparator;
   }
 
-  function log(level: LogLevel, args: any[]) {
+  function getTargetElement() {
     const targetElement = baseDomElement.querySelector(logTargetSelector);
-    const { logFormat, appender, logEntrySeparator } = logConfig;
-
     if (targetElement == null) {
       const msg = `Target element can not be selected using ${logTargetSelector} on ${baseDomElement}`;
       targetConsoleFunctions.error(msg);
       return;
     }
+    return targetElement;
+  }
+
+  function invokeWithTarget(fn: (targetElement: Element) => any) {
+    const targetElement = getTargetElement();
+    if (targetElement == null) return;
+    return fn(targetElement);
+  }
+
+  function log(targetElement: Element, level: LogLevel, args: any[]) {
+    const { logFormat, appender, logEntrySeparator } = logConfig;
 
     const formattedLogEntry = logFormat.format({ level, args });
 
@@ -61,13 +71,22 @@ export function createDOMConsoleLogInterceptor(
     actLogEntrySeparator = logEntrySeparator;
   }
 
+  function clear(targetElement: Element) {
+    const { appender } = logConfig;
+    appender.clear(targetElement);
+  }
+
   setLogTargetSelector();
   setLogConfig();
 
   return {
     invoke(invocation) {
       if (consoleLogFnNames.includes(invocation.fnName)) {
-        return log(invocation.fnName as LogLevel, invocation.args);
+        return invokeWithTarget((target) =>
+          log(target, invocation.fnName as LogLevel, invocation.args)
+        );
+      } else if (invocation.fnName === "clear") {
+        return invokeWithTarget(clear);
       }
       return invocation.proceed();
     },

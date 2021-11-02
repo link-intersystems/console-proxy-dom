@@ -2,6 +2,7 @@ import { LogLevel } from "@link-intersystems/console-proxy";
 
 export type HtmlElementAppender = {
   append: (element: Element, text: string) => void;
+  clear: (element: Element) => void;
 };
 
 export type LogEntry = {
@@ -27,6 +28,9 @@ export const valueAppender: HtmlElementAppender = {
     const newValue = actualValue + text;
     (element as HTMLInputElement).value = newValue;
   },
+  clear: function(element){
+    (element as HTMLInputElement).value = "";
+  }
 };
 
 export const innerHtmlAppender: HtmlElementAppender = {
@@ -35,6 +39,9 @@ export const innerHtmlAppender: HtmlElementAppender = {
     const newValue = actualValue + text;
     (element as HTMLElement).innerHTML = newValue;
   },
+  clear: function(element){
+    element.innerHTML = "";
+  }
 };
 
 export const simpleLogFormat: LogFormat = {

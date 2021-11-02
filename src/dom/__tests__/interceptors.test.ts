@@ -1,5 +1,6 @@
 import { screen } from "@testing-library/dom";
 import redirect_textarea from "./redirect_textarea.html";
+import redirect_div from "./redirect_div.html";
 import {
   createDOMConsoleLogInterceptor,
   DomConsoleLogInterceptor,
@@ -9,6 +10,7 @@ import {
   ConsoleProxy,
   createConsoleProxy,
 } from "@link-intersystems/console-proxy";
+import { defaultLogConfig } from "index";
 
 function createConsoleMock() {
   return consoleFnNames.reduce((proxy, fn) => {
@@ -29,6 +31,10 @@ describe("interceptors Tests", () => {
 
   function getInputValue(element: Element) {
     if (element) return (element as any).value;
+  }
+
+  function getInnerHtml(element: Element) {
+    if (element) return (element as any).innerHTML;
   }
 
   function logAllLevels() {
@@ -63,7 +69,26 @@ DEBUG: Debug
 ERROR: Error`);
   });
 
-  test("Redirect useing base element", async () => {
+  test("Console clear textarea", async () => {
+    document.body.innerHTML = redirect_textarea;
+
+    logAllLevels();
+    proxy.clear();
+
+    expectOutputToBe("");
+  });
+
+  test("Console clear div", async () => {
+    document.body.innerHTML = redirect_div;
+    domConsoleLogInterceptor.setLogConfig(defaultLogConfig);
+
+    logAllLevels();
+    proxy.clear();
+
+    expectOutputToBe("", getInnerHtml);
+  });
+
+  test("Redirect using base element", async () => {
     document.body.innerHTML = redirect_textarea;
 
     const container = document.body.querySelector(".container");
@@ -79,7 +104,7 @@ DEBUG: Debug
 ERROR: Error`);
   });
 
-  test("Redirect useing custom selector", async () => {
+  test("Redirect using custom selector", async () => {
     document.body.innerHTML = redirect_textarea;
 
     domConsoleLogInterceptor.setLogTargetSelector("textarea");
